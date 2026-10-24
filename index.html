@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>HTB Đa Hội Nghị V5.0 - Bản Độc Lập (GitHub • Cloudflare • Google Drive)</title>
+  <title>HTB Đa Hội Nghị V5.1 - Bản Độc Lập (GitHub • Cloudflare • Google Drive)</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="./config.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -38,9 +37,10 @@
 <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-md p-3 sm:p-4 overflow-y-auto no-print">
   <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-auto">
     <div class="sidebar-gradient p-5 sm:p-6 text-white text-center relative">
+      <button type="button" onclick="closeAuthModal()" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center" title="Đóng cửa sổ">✕</button>
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-[11px] font-bold mb-2">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-        HTB ĐA HỘI NGHỊ V5.0 • BẢN ĐỘC LẬP MỚI
+        HTB ĐA HỘI NGHỊ V5.1 • BẢN ĐỘC LẬP MỚI
       </div>
       <h1 class="text-lg sm:text-xl font-black tracking-tight">TRƯỜNG THPT HỒ THỊ BI</h1>
       <p id="authConfSubtitle" class="text-xs text-sky-200/90 mt-1">Đại hội Đại biểu Đoàn TNCS Hồ Chí Minh nhiệm kỳ 2026 - 2027</p>
@@ -48,27 +48,27 @@
 
     <!-- Chuyển 3 phân quyền -->
     <div class="grid grid-cols-3 bg-slate-100 p-1.5 m-4 rounded-2xl text-xs font-bold">
-      <button onclick="switchAuthTab('delegate')" id="authTab-delegate" class="py-2.5 rounded-xl bg-white text-sky-700 shadow-sm transition">📱 Đại biểu (QR)</button>
-      <button onclick="switchAuthTab('teller')" id="authTab-teller" class="py-2.5 rounded-xl text-slate-600 transition">🗳️ Kiểm phiếu</button>
-      <button onclick="switchAuthTab('admin')" id="authTab-admin" class="py-2.5 rounded-xl text-slate-600 transition">⚙️ Admin</button>
+      <button type="button" onclick="switchAuthTab('delegate')" id="authTab-delegate" class="py-2.5 rounded-xl bg-white text-sky-700 shadow-sm transition cursor-pointer">📱 Đại biểu (QR)</button>
+      <button type="button" onclick="switchAuthTab('teller')" id="authTab-teller" class="py-2.5 rounded-xl text-slate-600 hover:text-slate-900 transition cursor-pointer">🗳️ Kiểm phiếu</button>
+      <button type="button" onclick="switchAuthTab('admin')" id="authTab-admin" class="py-2.5 rounded-xl text-slate-600 hover:text-slate-900 transition cursor-pointer">⚙️ Admin</button>
     </div>
 
     <!-- TAB 1: ĐẠI BIỂU QUÉT QR VÀO THẲNG CHƯƠNG TRÌNH -->
-    <div id="authPanel-delegate" class="px-5 pb-6 space-y-3.5">
-      <div class="relative bg-slate-900 rounded-2xl h-44 flex flex-col items-center justify-center text-white overflow-hidden border-2 border-sky-500/40">
+    <div id="authPanel-delegate" class="px-5 pb-5 space-y-3.5">
+      <div class="relative bg-slate-900 rounded-2xl h-40 flex flex-col items-center justify-center text-white overflow-hidden border-2 border-sky-500/40">
         <video id="qrVideoPreview" class="absolute inset-0 w-full h-full object-cover hidden" playsinline></video>
         <div class="scan-line"></div>
-        <div class="relative z-10 w-24 h-24 border-2 border-dashed border-sky-400/80 rounded-2xl flex items-center justify-center bg-slate-950/40">
-          <span class="text-3xl">📷</span>
+        <div class="relative z-10 w-20 h-20 border-2 border-dashed border-sky-400/80 rounded-2xl flex items-center justify-center bg-slate-950/40">
+          <span class="text-2xl">📷</span>
         </div>
         <p id="qrCameraStatus" class="relative z-10 text-xs text-sky-200 mt-2 font-medium px-4 text-center">Quét mã QR trên thẻ đại biểu để điểm danh & vào thẳng Chương trình</p>
       </div>
 
       <div class="grid grid-cols-2 gap-2">
-        <button onclick="startRealCameraScan()" class="py-3 px-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-1.5">
+        <button type="button" onclick="startRealCameraScan()" class="py-3 px-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer">
           <span>🎥 Bật Camera Quét</span>
         </button>
-        <button onclick="quickQRLogin('HTB-001')" class="py-3 px-3 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold text-xs shadow-lg shadow-sky-600/30 flex items-center justify-center gap-1.5">
+        <button type="button" onclick="quickQRLogin('HTB-001')" class="py-3 px-3 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold text-xs shadow-lg shadow-sky-600/30 flex items-center justify-center gap-1.5 cursor-pointer">
           <span>⚡ Quét Nhanh (Demo)</span>
         </button>
       </div>
@@ -83,13 +83,13 @@
             <option value="HTB-004">HTB-004 • Phạm Tuấn Kiệt (Chi đoàn 11A1)</option>
             <option value="HTB-005">HTB-005 • Võ Ngọc Phương Nghi (Chi đoàn 10A3)</option>
           </select>
-          <button onclick="quickQRLogin(document.getElementById('qrDelegateSelect').value)" class="px-4 py-2.5 bg-sky-600 text-white text-xs font-extrabold rounded-xl hover:bg-sky-500 shrink-0">Vào ngay</button>
+          <button type="button" onclick="quickQRLogin(document.getElementById('qrDelegateSelect').value)" class="px-4 py-2.5 bg-sky-600 text-white text-xs font-extrabold rounded-xl hover:bg-sky-500 shrink-0 cursor-pointer">Vào ngay</button>
         </div>
       </div>
     </div>
 
     <!-- TAB 2: TÀI KHOẢN BAN KIỂM PHIẾU -->
-    <div id="authPanel-teller" class="px-5 pb-6 space-y-3 hidden">
+    <div id="authPanel-teller" class="px-5 pb-5 space-y-3 hidden">
       <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3 text-xs text-amber-900">
         <p class="font-bold">Tài khoản Ban Kiểm Phiếu:</p>
         <p class="mt-0.5">• Trưởng ban: <code class="font-mono font-bold">kiemphiu</code> / Mật khẩu: <code class="font-mono font-bold">kp123</code></p>
@@ -97,13 +97,13 @@
       </div>
       <input id="tellerUser" type="text" value="kiemphiu" placeholder="Tên đăng nhập" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold" />
       <input id="tellerPass" type="password" value="kp123" placeholder="Mật khẩu" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold" />
-      <button onclick="loginWithAccount('teller')" class="w-full py-3 rounded-2xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-sm shadow-lg shadow-amber-600/25">
+      <button type="button" onclick="loginWithAccount('teller')" class="w-full py-3 rounded-2xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-sm shadow-lg shadow-amber-600/25 cursor-pointer">
         🗳️ Đăng nhập Ban Kiểm Phiếu
       </button>
     </div>
 
     <!-- TAB 3: TÀI KHOẢN ADMIN / ĐOÀN CHỦ TỊCH -->
-    <div id="authPanel-admin" class="px-5 pb-6 space-y-3 hidden">
+    <div id="authPanel-admin" class="px-5 pb-5 space-y-3 hidden">
       <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-3 text-xs text-indigo-900">
         <p class="font-bold">Tài khoản Đoàn Chủ tịch / Admin:</p>
         <p class="mt-0.5">• Quản trị: <code class="font-mono font-bold">admin</code> / Mật khẩu: <code class="font-mono font-bold">htb2025</code></p>
@@ -111,9 +111,18 @@
       </div>
       <input id="adminUser" type="text" value="admin" placeholder="Tài khoản Admin" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold" />
       <input id="adminPass" type="password" value="htb2025" placeholder="Mật khẩu" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold" />
-      <button onclick="loginWithAccount('admin')" class="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/25">
+      <button type="button" onclick="loginWithAccount('admin')" class="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/25 cursor-pointer">
         ⚙️ Đăng nhập Admin Điều Hành
       </button>
+    </div>
+
+    <!-- Thanh Vào Nhanh 1 Chạm (Không cần nhập mật khẩu khi test) -->
+    <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex items-center justify-between gap-2 text-[11px]">
+      <span class="font-bold text-slate-500">Vào nhanh 1 chạm:</span>
+      <div class="flex gap-1.5">
+        <button type="button" onclick="enterDirectRole('teller')" class="px-2.5 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold cursor-pointer">🗳️ Vào Kiểm phiếu</button>
+        <button type="button" onclick="enterDirectRole('admin')" class="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold cursor-pointer">⚙️ Vào thẳng Admin</button>
+      </div>
     </div>
   </div>
 </div>
@@ -131,7 +140,7 @@
         <h2 id="stageConfTitle" class="text-xl sm:text-3xl font-black mt-0.5">Đại hội Đại biểu Đoàn TNCS Hồ Chí Minh nhiệm kỳ 2026 - 2027</h2>
       </div>
     </div>
-    <button onclick="toggleStageLed(false)" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold">✕ Thoát trình chiếu</button>
+    <button type="button" onclick="toggleStageLed(false)" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold cursor-pointer">✕ Thoát trình chiếu</button>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 my-auto py-6">
@@ -149,15 +158,15 @@
       <div class="text-xs font-bold uppercase text-rose-300">Đồng hồ Tham luận</div>
       <div id="stageTimerDisplay" class="text-5xl sm:text-6xl font-black font-mono text-white">05:00</div>
       <div class="flex justify-center gap-2 pt-2">
-        <button onclick="startSpeechTimer(300)" class="px-3 py-1 rounded-lg bg-sky-600 text-xs font-bold">5 phút</button>
-        <button onclick="startSpeechTimer(180)" class="px-3 py-1 rounded-lg bg-emerald-600 text-xs font-bold">3 phút</button>
-        <button onclick="stopSpeechTimer()" class="px-3 py-1 rounded-lg bg-rose-600 text-xs font-bold">Dừng</button>
+        <button type="button" onclick="startSpeechTimer(300)" class="px-3 py-1 rounded-lg bg-sky-600 text-xs font-bold cursor-pointer">5 phút</button>
+        <button type="button" onclick="startSpeechTimer(180)" class="px-3 py-1 rounded-lg bg-emerald-600 text-xs font-bold cursor-pointer">3 phút</button>
+        <button type="button" onclick="stopSpeechTimer()" class="px-3 py-1 rounded-lg bg-rose-600 text-xs font-bold cursor-pointer">Dừng</button>
       </div>
     </div>
   </div>
 
   <div class="text-center text-xs text-slate-400 border-t border-white/10 pt-4">
-    Hệ thống Điều hành Đa Hội Nghị V5.0 • Đồng bộ Thời gian thực qua Cloudflare D1 & Google Drive
+    Hệ thống Điều hành Đa Hội Nghị V5.1 • Đồng bộ Thời gian thực qua Cloudflare D1 & Google Drive
   </div>
 </div>
 
@@ -173,10 +182,10 @@
           <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center font-black text-white shadow-md">HTB</div>
           <div>
             <div class="text-[11px] font-bold text-sky-300 tracking-wider">THPT HỒ THỊ BI</div>
-            <div class="text-sm font-extrabold text-white">ĐA HỘI NGHỊ V5.0</div>
+            <div class="text-sm font-extrabold text-white">ĐA HỘI NGHỊ V5.1</div>
           </div>
         </div>
-        <button onclick="closeMobileSidebar()" class="lg:hidden p-2 rounded-xl bg-white/10 text-white hover:bg-white/20">✕</button>
+        <button type="button" onclick="closeMobileSidebar()" class="lg:hidden p-2 rounded-xl bg-white/10 text-white hover:bg-white/20">✕</button>
       </div>
 
       <!-- Chuyển loại Hội nghị -->
@@ -196,7 +205,7 @@
           <div id="currentRoleBadge" class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-300">ĐẠI BIỂU CHÍNH THỨC</div>
           <div id="currentUserName" class="text-xs font-bold text-white truncate">Nguyễn Minh Anh (HTB-001)</div>
         </div>
-        <button onclick="openAuthModal()" class="px-2.5 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 text-[11px] font-bold shrink-0 border border-sky-400/30">Đổi TK</button>
+        <button type="button" onclick="openAuthModal()" class="px-2.5 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 text-[11px] font-bold shrink-0 border border-sky-400/30 cursor-pointer">Đổi TK</button>
       </div>
 
       <!-- Danh sách Menu Trái -->
@@ -205,19 +214,19 @@
         <div>
           <div class="px-3 mb-1.5 text-[10px] font-extrabold uppercase tracking-widest text-sky-300/75">Phân hệ Đại biểu</div>
           <nav class="space-y-1">
-            <button onclick="switchTab('db-chuongtrinh')" id="nav-db-chuongtrinh" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition">
+            <button type="button" onclick="switchTab('db-chuongtrinh')" id="nav-db-chuongtrinh" class="nav-item nav-active w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition cursor-pointer">
               <span>📅</span><span>Chương trình Đại hội</span>
               <span class="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300">Live</span>
             </button>
-            <button onclick="switchTab('db-vankien')" id="nav-db-vankien" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition">
+            <button type="button" onclick="switchTab('db-vankien')" id="nav-db-vankien" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition cursor-pointer">
               <span>☁️</span><span>Văn kiện (Google Drive)</span>
               <span id="docCountBadge" class="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-sky-500/30 text-sky-200">3 file</span>
             </button>
-            <button onclick="switchTab('db-baucu')" id="nav-db-baucu" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition">
+            <button type="button" onclick="switchTab('db-baucu')" id="nav-db-baucu" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition cursor-pointer">
               <span>🗳️</span><span>Bầu cử Ban Chấp hành</span>
               <span id="badgeVotedStatus" class="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300">Chưa bầu</span>
             </button>
-            <button onclick="switchTab('db-bieuquyet')" id="nav-db-bieuquyet" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition">
+            <button type="button" onclick="switchTab('db-bieuquyet')" id="nav-db-bieuquyet" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition cursor-pointer">
               <span>✋</span><span>Biểu quyết Chỉ tiêu</span>
             </button>
           </nav>
@@ -227,23 +236,23 @@
         <div id="menuGroup-management" class="hidden">
           <div class="px-3 mb-1.5 text-[10px] font-extrabold uppercase tracking-widest text-amber-300/80">Ban Kiểm Phiếu & Admin</div>
           <nav class="space-y-1">
-            <button onclick="switchTab('kp-kiemphiu')" id="nav-kp-kiemphiu" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition">
+            <button type="button" onclick="switchTab('kp-kiemphiu')" id="nav-kp-kiemphiu" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition cursor-pointer">
               <span>📊</span><span>Giám sát & Kiểm phiếu</span>
             </button>
-            <button onclick="switchTab('ad-diemdan')" id="nav-ad-diemdan" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition">
+            <button type="button" onclick="switchTab('ad-diemdan')" id="nav-ad-diemdan" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition cursor-pointer">
               <span>⚡</span><span>Điều hành & Điểm danh</span>
             </button>
-            <button onclick="switchTab('ad-trunglap')" id="nav-ad-trunglap" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition">
+            <button type="button" onclick="switchTab('ad-trunglap')" id="nav-ad-trunglap" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition cursor-pointer">
               <span>🛡️</span><span>Kiểm tra Trùng lặp</span>
               <span id="dupCountBadge" class="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-rose-500 text-white font-bold">2</span>
             </button>
-            <button onclick="switchTab('ad-theqr')" id="nav-ad-theqr" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition">
+            <button type="button" onclick="switchTab('ad-theqr')" id="nav-ad-theqr" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition cursor-pointer">
               <span>🖨️</span><span>Phôi Thẻ QR & Link Quét</span>
             </button>
-            <button onclick="switchTab('ad-cloud')" id="nav-ad-cloud" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition">
+            <button type="button" onclick="switchTab('ad-cloud')" id="nav-ad-cloud" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition cursor-pointer">
               <span>🔗</span><span>Kết nối Cloud & Drive</span>
             </button>
-            <button onclick="toggleStageLed(true)" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-400/20 transition">
+            <button type="button" onclick="toggleStageLed(true)" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-400/20 transition cursor-pointer">
               <span>🖥️</span><span>Màn hình Sân khấu LED</span>
             </button>
           </nav>
@@ -255,12 +264,12 @@
     <div class="p-3.5 border-t border-white/10 bg-slate-950/40 space-y-2">
       <div class="flex items-center justify-between text-[10px] text-sky-200/80">
         <span>Chuyển nhanh góc nhìn:</span>
-        <span id="cloudStatusDot" class="font-bold text-emerald-400">● Độc lập V5</span>
+        <span class="font-bold text-emerald-400">● Độc lập V5.1</span>
       </div>
       <div class="grid grid-cols-3 gap-1.5 text-[11px] font-bold">
-        <button onclick="quickSwitchRole('delegate')" id="roleBtn-delegate" class="py-1.5 rounded-lg bg-sky-500 text-white">Đại biểu</button>
-        <button onclick="quickSwitchRole('teller')" id="roleBtn-teller" class="py-1.5 rounded-lg bg-white/10 text-slate-300">Kiểm phiếu</button>
-        <button onclick="quickSwitchRole('admin')" id="roleBtn-admin" class="py-1.5 rounded-lg bg-white/10 text-slate-300">Admin</button>
+        <button type="button" onclick="quickSwitchRole('delegate')" id="roleBtn-delegate" class="py-1.5 rounded-lg bg-sky-500 text-white cursor-pointer">Đại biểu</button>
+        <button type="button" onclick="quickSwitchRole('teller')" id="roleBtn-teller" class="py-1.5 rounded-lg bg-white/10 text-slate-300 cursor-pointer">Kiểm phiếu</button>
+        <button type="button" onclick="quickSwitchRole('admin')" id="roleBtn-admin" class="py-1.5 rounded-lg bg-white/10 text-slate-300 cursor-pointer">Admin</button>
       </div>
     </div>
   </aside>
@@ -270,7 +279,7 @@
     <header class="glass-header sticky top-0 z-20 border-b border-slate-200/80 px-4 py-3 flex items-center justify-between shadow-xs no-print">
       <div class="flex items-center gap-3">
         <!-- Nút mở Menu Trái trên Di động -->
-        <button onclick="openMobileSidebar()" class="lg:hidden p-2.5 rounded-2xl bg-slate-900 text-white shadow-sm active:scale-95 transition" aria-label="Mở menu">
+        <button type="button" onclick="openMobileSidebar()" class="lg:hidden p-2.5 rounded-2xl bg-slate-900 text-white shadow-sm active:scale-95 transition cursor-pointer" aria-label="Mở menu">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 6h16M4 12h16M4 18h10"/>
           </svg>
@@ -285,7 +294,10 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <button onclick="openAuthModal()" class="px-3 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 text-xs font-bold flex items-center gap-1.5">
+        <button type="button" onclick="enterDirectRole('admin')" class="hidden sm:inline-flex px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold cursor-pointer">
+          ⚙️ Quyền Admin
+        </button>
+        <button type="button" onclick="openAuthModal()" class="px-3 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 text-xs font-bold flex items-center gap-1.5 cursor-pointer">
           <span>📷</span><span class="hidden sm:inline">Quét QR / Đổi TK</span>
         </button>
       </div>
@@ -325,12 +337,11 @@
           <div id="agendaListContainer" class="space-y-3"></div>
         </div>
 
-        <!-- Khung Đăng ký phát biểu / thảo luận của Đại biểu -->
         <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-3">
           <h4 class="text-sm font-extrabold text-slate-900">🎙️ Đăng ký Phát biểu / Tham luận tại Hội trường</h4>
           <div class="flex flex-col sm:flex-row gap-2">
             <input id="speechTopicInput" type="text" placeholder="Nhập chủ đề tham luận hoặc ý kiến đóng góp..." class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold bg-slate-50" />
-            <button onclick="registerSpeech()" class="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shrink-0">Gửi đăng ký lên Đoàn Chủ tịch</button>
+            <button type="button" onclick="registerSpeech()" class="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shrink-0 cursor-pointer">Gửi đăng ký lên Đoàn Chủ tịch</button>
           </div>
           <div id="speechQueueContainer" class="space-y-2 pt-1"></div>
         </div>
@@ -349,8 +360,8 @@
             </div>
             <div class="flex flex-wrap items-center gap-2">
               <input id="docSearchInput" oninput="renderDocuments()" type="text" placeholder="Tìm văn kiện..." class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-slate-50" />
-              <button onclick="syncFromGoogleDriveFolder()" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold">🔄 Đồng bộ Drive</button>
-              <button onclick="toggleDriveAddBox()" class="px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold">+ Nạp link Drive</button>
+              <button type="button" onclick="syncFromGoogleDriveFolder()" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold cursor-pointer">🔄 Đồng bộ Drive</button>
+              <button type="button" onclick="toggleDriveAddBox()" class="px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold cursor-pointer">+ Nạp link Drive</button>
             </div>
           </div>
 
@@ -358,7 +369,7 @@
           <div id="driveAddBox" class="hidden bg-sky-50/90 border border-sky-200 rounded-2xl p-4 space-y-3">
             <div class="flex items-center justify-between">
               <span class="text-xs font-extrabold text-sky-900">🔗 Dán Link File hoặc Thư mục từ Google Drive</span>
-              <button onclick="toggleDriveAddBox()" class="text-xs text-slate-500 font-bold">Đóng ✕</button>
+              <button type="button" onclick="toggleDriveAddBox()" class="text-xs text-slate-500 font-bold cursor-pointer">Đóng ✕</button>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               <input id="newDriveTitle" type="text" placeholder="Tên văn kiện (VD: Báo cáo chính trị PDF)" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white" />
@@ -371,13 +382,12 @@
                 <option value="SLIDES">Google Slides</option>
                 <option value="FOLDER">Nguyên Thư mục Google Drive</option>
               </select>
-              <button onclick="addGoogleDriveDocument()" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800">
+              <button type="button" onclick="addGoogleDriveDocument()" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 cursor-pointer">
                 ☁️ Lưu & Nhúng vào Hội nghị
               </button>
             </div>
           </div>
 
-          <!-- Danh sách thẻ Văn kiện -->
           <div id="documentListContainer" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
 
           <!-- Khung xem trực tiếp Google Drive -->
@@ -388,13 +398,13 @@
                 <h4 id="readerDocTitle" class="text-xs sm:text-sm font-extrabold truncate">Báo cáo tổng kết công tác Đoàn</h4>
               </div>
               <div class="flex items-center gap-1.5">
-                <button onclick="switchReaderMode('drive')" id="modeBtn-drive" class="px-2.5 py-1.5 rounded-xl bg-sky-600 text-white text-[11px] font-bold">☁️ Xem Drive</button>
-                <button onclick="switchReaderMode('text')" id="modeBtn-text" class="px-2.5 py-1.5 rounded-xl bg-white/10 text-slate-300 text-[11px] font-bold">📖 Đọc nhanh</button>
+                <button type="button" onclick="switchReaderMode('drive')" id="modeBtn-drive" class="px-2.5 py-1.5 rounded-xl bg-sky-600 text-white text-[11px] font-bold cursor-pointer">☁️ Xem Drive</button>
+                <button type="button" onclick="switchReaderMode('text')" id="modeBtn-text" class="px-2.5 py-1.5 rounded-xl bg-white/10 text-slate-300 text-[11px] font-bold cursor-pointer">📖 Đọc nhanh</button>
                 <a id="driveDirectOpenLink" href="#" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold">↗ Mở App Drive</a>
               </div>
             </div>
 
-            <div id="driveIframeWrapper" class="relative bg-slate-800 w-full h-[460px] sm:h-[580px]">
+            <div id="driveIframeWrapper" class="relative bg-slate-800 w-full h-[460px] sm:h-[560px]">
               <iframe id="drivePreviewIframe" src="" class="w-full h-full border-0 bg-white" allow="autoplay"></iframe>
               <div class="bg-slate-900/95 px-4 py-2 text-[11px] text-sky-200 flex flex-wrap items-center justify-between gap-2 border-t border-white/10">
                 <span>💡 Đảm bảo file trên Google Drive đã bật quyền: <strong>"Bất kỳ ai có đường liên kết đều có thể xem"</strong>.</span>
@@ -435,8 +445,8 @@
           </div>
 
           <div class="flex flex-col sm:flex-row gap-2.5 pt-2">
-            <button onclick="selectAllValidCandidates()" class="py-3 px-4 rounded-2xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50">Chọn nhanh đủ số lượng</button>
-            <button onclick="submitDelegateBallot()" class="flex-1 py-3.5 px-5 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 text-white font-extrabold text-sm shadow-lg shadow-sky-600/25">
+            <button type="button" onclick="selectAllValidCandidates()" class="py-3 px-4 rounded-2xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer">Chọn nhanh đủ số lượng</button>
+            <button type="button" onclick="submitDelegateBallot()" class="flex-1 py-3.5 px-5 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 text-white font-extrabold text-sm shadow-lg shadow-sky-600/25 cursor-pointer">
               🗳️ Ký số & Bỏ vào hòm phiếu điện tử
             </button>
           </div>
@@ -460,8 +470,8 @@
               <h3 class="text-base font-extrabold text-slate-900 mt-1">📊 Tổng hợp Kết quả Kiểm phiếu & Xuất Biên bản</h3>
             </div>
             <div class="flex gap-2">
-              <button onclick="exportWordMinutes()" class="px-3.5 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold hover:bg-sky-500">📄 Xuất Biên bản (.DOC)</button>
-              <button onclick="exportCsvResults()" class="px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800">📊 Xuất Excel (.CSV)</button>
+              <button type="button" onclick="exportWordMinutes()" class="px-3.5 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold hover:bg-sky-500 cursor-pointer">📄 Xuất Biên bản (.DOC)</button>
+              <button type="button" onclick="exportCsvResults()" class="px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 cursor-pointer">📊 Xuất Excel (.CSV)</button>
             </div>
           </div>
           <div id="tellerResultsContainer" class="space-y-3"></div>
@@ -479,12 +489,11 @@
             <input id="rosterSearch" oninput="renderRosterTable()" type="text" placeholder="Tìm mã HTB-001 hoặc tên..." class="px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-slate-50" />
           </div>
 
-          <!-- Nhập nhanh danh sách đại biểu từ Excel/Clipboard -->
           <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
             <label class="text-xs font-bold text-slate-700 block">📋 Dán nhanh danh sách Đại biểu từ Excel (Mỗi dòng: Mã | Họ tên | Chi đoàn):</label>
             <div class="flex flex-col sm:flex-row gap-2">
               <textarea id="bulkDelegateInput" rows="2" placeholder="HTB-006 | Nguyễn Hải Đăng | Chi đoàn 12A3" class="flex-1 rounded-xl border border-slate-200 p-2.5 text-xs font-mono bg-white"></textarea>
-              <button onclick="importBulkDelegates()" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold shrink-0">Nạp vào Danh sách</button>
+              <button type="button" onclick="importBulkDelegates()" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold shrink-0 cursor-pointer">Nạp vào Danh sách</button>
             </div>
           </div>
 
@@ -508,7 +517,7 @@
               <h3 class="text-base font-extrabold text-slate-900">🖨️ Phôi Thẻ QR Đại biểu (Quét Camera Zalo/Điện thoại vào thẳng Chương trình)</h3>
               <p class="text-xs text-slate-500">Mỗi mã QR chứa đường dẫn tự động đăng nhập dạng <code class="font-mono font-bold">?qr=HTB-001</code></p>
             </div>
-            <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold">🖨️ In danh sách thẻ QR</button>
+            <button type="button" onclick="window.print()" class="px-4 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold cursor-pointer">🖨️ In danh sách thẻ QR</button>
           </div>
           <div id="qrCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
         </div>
@@ -518,7 +527,7 @@
       <section id="tab-ad-cloud" class="tab-panel space-y-4 hidden">
         <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-4">
           <div>
-            <span class="text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-md bg-indigo-100 text-indigo-800">CẤU HÌNH HỆ THỐNG ĐỘC LẬP V5.0</span>
+            <span class="text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-md bg-indigo-100 text-indigo-800">CẤU HÌNH HỆ THỐNG ĐỘC LẬP V5.1</span>
             <h3 class="text-base font-extrabold text-slate-900 mt-1">🔗 Kết nối Cloudflare Worker (D1) & Google Drive</h3>
             <p class="text-xs text-slate-500">Tách biệt hoàn toàn dữ liệu với trang cũ <code class="font-mono">daihoi-doan-hothibi</code></p>
           </div>
@@ -537,8 +546,8 @@
               <input id="cfgDriveFolderId" type="text" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono" />
             </div>
             <div class="flex flex-wrap gap-2 pt-2">
-              <button onclick="saveCloudConfig()" class="px-4 py-2.5 rounded-xl bg-sky-600 text-white font-bold">💾 Lưu Cấu hình Kết nối</button>
-              <button onclick="exportFullBackupJson()" class="px-4 py-2.5 rounded-xl bg-slate-900 text-white font-bold">📦 Xuất Toàn bộ Dữ liệu (.JSON)</button>
+              <button type="button" onclick="saveCloudConfig()" class="px-4 py-2.5 rounded-xl bg-sky-600 text-white font-bold cursor-pointer">💾 Lưu Cấu hình Kết nối</button>
+              <button type="button" onclick="exportFullBackupJson()" class="px-4 py-2.5 rounded-xl bg-slate-900 text-white font-bold cursor-pointer">📦 Xuất Toàn bộ Dữ liệu (.JSON)</button>
             </div>
           </div>
         </div>
@@ -550,16 +559,16 @@
 
 <!-- THANH ĐIỀU HƯỚNG ĐÁY DÀNH RIÊNG CHO DI ĐỘNG -->
 <nav class="lg:hidden fixed bottom-0 inset-x-0 z-20 bg-white/95 backdrop-blur-md border-t border-slate-200 grid grid-cols-4 py-1.5 px-2 shadow-lg no-print">
-  <button onclick="switchTab('db-chuongtrinh')" id="mnav-db-chuongtrinh" class="mnav-item flex flex-col items-center py-1 rounded-xl text-sky-600 font-bold text-[11px]">
+  <button type="button" onclick="switchTab('db-chuongtrinh')" id="mnav-db-chuongtrinh" class="mnav-item flex flex-col items-center py-1 rounded-xl text-sky-600 font-bold text-[11px]">
     <span class="text-base">📅</span><span>Chương trình</span>
   </button>
-  <button onclick="switchTab('db-vankien')" id="mnav-db-vankien" class="mnav-item flex flex-col items-center py-1 rounded-xl text-slate-500 font-semibold text-[11px]">
+  <button type="button" onclick="switchTab('db-vankien')" id="mnav-db-vankien" class="mnav-item flex flex-col items-center py-1 rounded-xl text-slate-500 font-semibold text-[11px]">
     <span class="text-base">☁️</span><span>Văn kiện Drive</span>
   </button>
-  <button onclick="switchTab('db-baucu')" id="mnav-db-baucu" class="mnav-item flex flex-col items-center py-1 rounded-xl text-slate-500 font-semibold text-[11px]">
+  <button type="button" onclick="switchTab('db-baucu')" id="mnav-db-baucu" class="mnav-item flex flex-col items-center py-1 rounded-xl text-slate-500 font-semibold text-[11px]">
     <span class="text-base">🗳️</span><span>Bầu cử</span>
   </button>
-  <button onclick="switchTab('db-bieuquyet')" id="mnav-db-bieuquyet" class="mnav-item flex flex-col items-center py-1 rounded-xl text-slate-500 font-semibold text-[11px]">
+  <button type="button" onclick="switchTab('db-bieuquyet')" id="mnav-db-bieuquyet" class="mnav-item flex flex-col items-center py-1 rounded-xl text-slate-500 font-semibold text-[11px]">
     <span class="text-base">✋</span><span>Biểu quyết</span>
   </button>
 </nav>
@@ -567,20 +576,25 @@
 <div id="toastBox" class="fixed top-4 right-4 z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl text-xs font-bold border border-sky-400/30 no-print"></div>
 
 <script>
-  const STORAGE_PREFIX = (window.HTB_CONFIG && window.HTB_CONFIG.STORAGE_PREFIX) || "HTB_V5_IND_";
+  window.HTB_CONFIG = window.HTB_CONFIG || {
+    APP_VERSION: "5.1.0-INDEPENDENT",
+    STORAGE_PREFIX: "HTB_V5_IND_",
+    GOOGLE_DRIVE_FOLDER_ID: "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
+  };
+  const STORAGE_PREFIX = window.HTB_CONFIG.STORAGE_PREFIX || "HTB_V5_IND_";
 
   function toGoogleDriveEmbedUrl(rawUrl) {
     if (!rawUrl) return "";
     const url = rawUrl.trim();
     const docsMatch = url.match(/docs\.google\.com\/(document|presentation|spreadsheets)\/d\/([a-zA-Z0-9_-]+)/);
-    if (docsMatch) return `https://docs.google.com/${docsMatch[1]}/d/${docsMatch[2]}/preview`;
+    if (docsMatch) return "https://docs.google.com/" + docsMatch[1] + "/d/" + docsMatch[2] + "/preview";
     const fileMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
-    if (fileMatch) return `https://drive.google.com/file/d/${fileMatch[1]}/preview`;
+    if (fileMatch) return "https://drive.google.com/file/d/" + fileMatch[1] + "/preview";
     const idParamMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-    if (idParamMatch) return `https://drive.google.com/file/d/${idParamMatch[1]}/preview`;
+    if (idParamMatch) return "https://drive.google.com/file/d/" + idParamMatch[1] + "/preview";
     const folderMatch = url.match(/drive\.google\.com\/drive\/(?:u\/\d+\/)?folders\/([a-zA-Z0-9_-]+)/);
-    if (folderMatch) return `https://drive.google.com/embeddedfolderview?id=${folderMatch[1]}#list`;
-    if (/^[a-zA-Z0-9_-]{20,}$/.test(url)) return `https://drive.google.com/file/d/${url}/preview`;
+    if (folderMatch) return "https://drive.google.com/embeddedfolderview?id=" + folderMatch[1] + "#list";
+    if (/^[a-zA-Z0-9_-]{20,}$/.test(url)) return "https://drive.google.com/file/d/" + url + "/preview";
     return url;
   }
 
@@ -726,10 +740,11 @@
 
   function showToast(msg) {
     const box = document.getElementById("toastBox");
+    if (!box) return;
     box.textContent = msg;
     box.classList.remove("hidden");
     clearTimeout(window._toastTimer);
-    window._toastTimer = setTimeout(() => box.classList.add("hidden"), 3000);
+    window._toastTimer = setTimeout(function() { box.classList.add("hidden"); }, 3000);
   }
 
   function openMobileSidebar() {
@@ -743,20 +758,39 @@
   function openAuthModal() {
     document.getElementById("authModal").classList.remove("hidden");
   }
+  function closeAuthModal() {
+    document.getElementById("authModal").classList.add("hidden");
+  }
+
   function switchAuthTab(tab) {
-    ["delegate", "teller", "admin"].forEach(t => {
-      document.getElementById("authPanel-" + t).classList.toggle("hidden", t !== tab);
-      document.getElementById("authTab-" + t).className = (t === tab)
-        ? "py-2.5 rounded-xl bg-white text-sky-700 shadow-sm transition"
-        : "py-2.5 rounded-xl text-slate-600 transition";
+    ["delegate", "teller", "admin"].forEach(function(t) {
+      const panel = document.getElementById("authPanel-" + t);
+      const btn = document.getElementById("authTab-" + t);
+      if (panel) panel.classList.toggle("hidden", t !== tab);
+      if (btn) {
+        btn.className = (t === tab)
+          ? "py-2.5 rounded-xl bg-white text-sky-700 shadow-sm transition cursor-pointer"
+          : "py-2.5 rounded-xl text-slate-600 hover:text-slate-900 transition cursor-pointer";
+      }
     });
+  }
+
+  function enterDirectRole(role) {
+    if (role === "admin") {
+      document.getElementById("currentUserName").textContent = "Quản trị viên Hệ thống (Admin)";
+    } else if (role === "teller") {
+      document.getElementById("currentUserName").textContent = "Trưởng Ban Kiểm Phiếu";
+    }
+    quickSwitchRole(role, false);
+    closeAuthModal();
   }
 
   async function startRealCameraScan() {
     const video = document.getElementById("qrVideoPreview");
     const status = document.getElementById("qrCameraStatus");
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      showToast("⚠️ Trình duyệt đang chặn Camera, vui lòng chọn mã thẻ bên dưới!");
+      showToast("⚠️ Trình duyệt đang chặn Camera, đã chuyển sang quét nhanh!");
+      quickQRLogin("HTB-001");
       return;
     }
     try {
@@ -765,20 +799,19 @@
       video.classList.remove("hidden");
       await video.play();
       status.textContent = "Đang bật Camera quét QR... Đưa thẻ vào khung ngắm";
-      setTimeout(() => {
-        stream.getTracks().forEach(t => t.stop());
+      setTimeout(function() {
+        stream.getTracks().forEach(function(t) { t.stop(); });
         video.classList.add("hidden");
         quickQRLogin("HTB-001");
-      }, 2200);
+      }, 2000);
     } catch (e) {
-      showToast("💡 Đã chuyển sang chế độ Quét QR nhanh!");
       quickQRLogin("HTB-001");
     }
   }
 
   function quickQRLogin(code) {
     const cleanCode = String(code || "HTB-001").trim().toUpperCase();
-    let found = DELEGATES.find(d => d.code === cleanCode);
+    let found = DELEGATES.find(function(d) { return d.code === cleanCode; });
     if (!found) {
       found = { code: cleanCode, name: "Đại biểu " + cleanCode, group: "Đại biểu chính thức", present: true, time: "07:30" };
       DELEGATES.unshift(found);
@@ -792,10 +825,9 @@
     document.getElementById("bannerDelegateName").textContent = "Đại biểu: " + found.name;
     document.getElementById("bannerCheckinTime").textContent = found.time;
     document.getElementById("currentUserName").textContent = found.name + " (" + found.code + ")";
-    localStorage.setItem(STORAGE_PREFIX + "CURRENT_DELEGATE", JSON.stringify(found));
 
     quickSwitchRole("delegate", true);
-    document.getElementById("authModal").classList.add("hidden");
+    closeAuthModal();
     switchTab("db-chuongtrinh");
     renderRosterTable();
     showToast("✅ Điểm danh QR thành công: " + found.name);
@@ -806,28 +838,37 @@
       const u = document.getElementById("tellerUser").value.trim();
       const p = document.getElementById("tellerPass").value.trim();
       if ((u === "kiemphiu" || u === "thukykp") && p === "kp123") {
+        document.getElementById("currentUserName").textContent = "Ban Kiểm Phiếu (" + u + ")";
         quickSwitchRole("teller", true);
-        document.getElementById("authModal").classList.add("hidden");
+        closeAuthModal();
         showToast("🗳️ Đã đăng nhập quyền Ban Kiểm Phiếu");
-      } else showToast("⚠️ Sai mật khẩu (kiemphiu / kp123)");
+      } else {
+        showToast("⚠️ Sai mật khẩu (kiemphiu / kp123)");
+      }
     } else {
       const u = document.getElementById("adminUser").value.trim();
       const p = document.getElementById("adminPass").value.trim();
       if ((u === "admin" || u === "chutoa") && p === "htb2025") {
+        document.getElementById("currentUserName").textContent = "Quản trị viên (" + u + ")";
         quickSwitchRole("admin", true);
-        document.getElementById("authModal").classList.add("hidden");
+        closeAuthModal();
         showToast("⚙️ Đã đăng nhập quyền Admin Điều Hành");
-      } else showToast("⚠️ Sai mật khẩu (admin / htb2025)");
+      } else {
+        showToast("⚠️ Sai mật khẩu (admin / htb2025)");
+      }
     }
   }
 
   function quickSwitchRole(role, silent) {
     const roleLabelMap = { delegate: "ĐẠI BIỂU CHÍNH THỨC", teller: "BAN KIỂM PHIẾU", admin: "ADMIN ĐIỀU HÀNH" };
     document.getElementById("currentRoleBadge").textContent = roleLabelMap[role];
-    ["delegate", "teller", "admin"].forEach(r => {
-      document.getElementById("roleBtn-" + r).className = (r === role)
-        ? "py-1.5 rounded-lg bg-sky-500 text-white"
-        : "py-1.5 rounded-lg bg-white/10 text-slate-300";
+    ["delegate", "teller", "admin"].forEach(function(r) {
+      const btn = document.getElementById("roleBtn-" + r);
+      if (btn) {
+        btn.className = (r === role)
+          ? "py-1.5 rounded-lg bg-sky-500 text-white cursor-pointer"
+          : "py-1.5 rounded-lg bg-white/10 text-slate-300 cursor-pointer";
+      }
     });
     const mgmtGroup = document.getElementById("menuGroup-management");
     if (role === "delegate") {
@@ -844,16 +885,20 @@
   }
 
   function switchTab(tabId) {
-    document.querySelectorAll(".tab-panel").forEach(el => el.classList.add("hidden"));
-    document.getElementById("tab-" + tabId)?.classList.remove("hidden");
-    document.querySelectorAll(".nav-item").forEach(btn => btn.classList.remove("nav-active"));
-    document.getElementById("nav-" + tabId)?.classList.add("nav-active");
+    document.querySelectorAll(".tab-panel").forEach(function(el) { el.classList.add("hidden"); });
+    const panel = document.getElementById("tab-" + tabId);
+    if (panel) panel.classList.remove("hidden");
 
-    document.querySelectorAll(".mnav-item").forEach(btn => {
+    document.querySelectorAll(".nav-item").forEach(function(btn) { btn.classList.remove("nav-active"); });
+    const navBtn = document.getElementById("nav-" + tabId);
+    if (navBtn) navBtn.classList.add("nav-active");
+
+    document.querySelectorAll(".mnav-item").forEach(function(btn) {
       btn.classList.remove("text-sky-600", "font-bold");
       btn.classList.add("text-slate-500", "font-semibold");
     });
-    document.getElementById("mnav-" + tabId)?.classList.add("text-sky-600", "font-bold");
+    const mBtn = document.getElementById("mnav-" + tabId);
+    if (mBtn) mBtn.classList.add("text-sky-600", "font-bold");
     closeMobileSidebar();
   }
 
@@ -872,7 +917,6 @@
     showToast("Đã chuyển sang: " + conf.badge);
   }
 
-  // ================= GOOGLE DRIVE FUNCTIONS =================
   function toggleDriveAddBox() {
     document.getElementById("driveAddBox").classList.toggle("hidden");
   }
@@ -896,7 +940,6 @@
       body: "Tài liệu đang được nhúng trực tiếp từ Google Drive: <code>" + rawUrl + "</code>"
     };
     conf.documents.unshift(newDoc);
-    localStorage.setItem(STORAGE_PREFIX + "DOCS_" + currentConfKey, JSON.stringify(conf.documents));
     document.getElementById("newDriveTitle").value = "";
     document.getElementById("newDriveUrl").value = "";
     document.getElementById("driveAddBox").classList.add("hidden");
@@ -905,39 +948,23 @@
     showToast("☁️ Đã nạp thành công văn kiện từ Google Drive!");
   }
 
-  async function syncFromGoogleDriveFolder() {
-    const gasUrl = localStorage.getItem(STORAGE_PREFIX + "GAS_URL") || (window.HTB_CONFIG && window.HTB_CONFIG.GOOGLE_DRIVE_GAS_URL);
-    const folderId = localStorage.getItem(STORAGE_PREFIX + "DRIVE_FOLDER_ID") || (window.HTB_CONFIG && window.HTB_CONFIG.GOOGLE_DRIVE_FOLDER_ID);
-    if (!gasUrl) {
-      const conf = CONFERENCES[currentConfKey];
-      const folderDocId = "FOLDER-DRIVE";
-      if (!conf.documents.some(d => d.id === folderDocId)) {
-        conf.documents.unshift({
-          id: folderDocId,
-          type: "FOLDER",
-          title: "Thư mục Google Drive Văn kiện Chung của Trường",
-          driveUrl: `https://drive.google.com/drive/folders/${folderId}`,
-          summary: "Hiển thị toàn bộ các file PDF, Word, Slide nằm trong thư mục Google Drive của Đại hội.",
-          body: "Danh sách tệp được tải trực tiếp từ Thư mục Google Drive."
-        });
-      }
-      renderDocuments();
-      openDocument(folderDocId);
-      showToast("☁️ Đã nhúng trực tiếp Thư mục Google Drive!");
-      return;
+  function syncFromGoogleDriveFolder() {
+    const folderId = localStorage.getItem(STORAGE_PREFIX + "DRIVE_FOLDER_ID") || window.HTB_CONFIG.GOOGLE_DRIVE_FOLDER_ID;
+    const conf = CONFERENCES[currentConfKey];
+    const folderDocId = "FOLDER-DRIVE";
+    if (!conf.documents.some(function(d) { return d.id === folderDocId; })) {
+      conf.documents.unshift({
+        id: folderDocId,
+        type: "FOLDER",
+        title: "Thư mục Google Drive Văn kiện Chung của Trường",
+        driveUrl: "https://drive.google.com/drive/folders/" + folderId,
+        summary: "Hiển thị toàn bộ các file PDF, Word, Slide nằm trong thư mục Google Drive của Đại hội.",
+        body: "Danh sách tệp được tải trực tiếp từ Thư mục Google Drive."
+      });
     }
-    try {
-      showToast("🔄 Đang quét danh sách file từ Google Drive...");
-      const res = await fetch(`${gasUrl}?folderId=${encodeURIComponent(folderId)}`);
-      const data = await res.json();
-      if (data.ok && Array.isArray(data.documents)) {
-        CONFERENCES[currentConfKey].documents = data.documents;
-        renderDocuments();
-        showToast(`✅ Đã đồng bộ ${data.documents.length} tệp từ Google Drive!`);
-      }
-    } catch (e) {
-      showToast("⚠️ Không thể kết nối GAS URL, đã mở chế độ nhúng Folder Drive trực tiếp.");
-    }
+    renderDocuments();
+    openDocument(folderDocId);
+    showToast("☁️ Đã nhúng trực tiếp Thư mục Google Drive!");
   }
 
   function switchReaderMode(mode) {
@@ -945,33 +972,32 @@
     document.getElementById("driveIframeWrapper").classList.toggle("hidden", !isDrive);
     document.getElementById("driveTextFallback").classList.toggle("hidden", isDrive);
     document.getElementById("modeBtn-drive").className = isDrive
-      ? "px-2.5 py-1.5 rounded-xl bg-sky-600 text-white text-[11px] font-bold"
-      : "px-2.5 py-1.5 rounded-xl bg-white/10 text-slate-300 text-[11px] font-bold";
+      ? "px-2.5 py-1.5 rounded-xl bg-sky-600 text-white text-[11px] font-bold cursor-pointer"
+      : "px-2.5 py-1.5 rounded-xl bg-white/10 text-slate-300 text-[11px] font-bold cursor-pointer";
     document.getElementById("modeBtn-text").className = !isDrive
-      ? "px-2.5 py-1.5 rounded-xl bg-sky-600 text-white text-[11px] font-bold"
-      : "px-2.5 py-1.5 rounded-xl bg-white/10 text-slate-300 text-[11px] font-bold";
+      ? "px-2.5 py-1.5 rounded-xl bg-sky-600 text-white text-[11px] font-bold cursor-pointer"
+      : "px-2.5 py-1.5 rounded-xl bg-white/10 text-slate-300 text-[11px] font-bold cursor-pointer";
   }
 
   function renderDocuments() {
     const conf = CONFERENCES[currentConfKey];
     document.getElementById("docCountBadge").textContent = conf.documents.length + " file";
     const q = (document.getElementById("docSearchInput")?.value || "").toLowerCase();
-    const list = conf.documents.filter(d => d.title.toLowerCase().includes(q) || d.summary.toLowerCase().includes(q));
+    const list = conf.documents.filter(function(d) {
+      return d.title.toLowerCase().includes(q) || d.summary.toLowerCase().includes(q);
+    });
     const container = document.getElementById("documentListContainer");
-    container.innerHTML = list.map(doc => {
+    container.innerHTML = list.map(function(doc) {
       const isSelected = doc.id === currentDocId;
-      return `
-        <div onclick="openDocument('${doc.id}')" class="cursor-pointer p-4 rounded-2xl border-2 transition space-y-1.5 ${isSelected ? 'border-sky-600 bg-sky-50/60 shadow-xs' : 'border-slate-200 hover:border-sky-400 bg-white'}">
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-sky-100 text-sky-800">☁️ ${doc.id} • ${doc.type || 'DRIVE'}</span>
-            <span class="text-[11px] font-bold text-sky-600">Nạp file →</span>
-          </div>
-          <div class="text-xs sm:text-sm font-extrabold text-slate-900">${doc.title}</div>
-          <p class="text-xs text-slate-500 line-clamp-2">${doc.summary}</p>
-        </div>
-      `;
+      return '<div onclick="openDocument(\'' + doc.id + '\')" class="cursor-pointer p-4 rounded-2xl border-2 transition space-y-1.5 ' +
+        (isSelected ? 'border-sky-600 bg-sky-50/60 shadow-xs' : 'border-slate-200 hover:border-sky-400 bg-white') + '">' +
+        '<div class="flex items-center justify-between">' +
+        '<span class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-sky-100 text-sky-800">☁️ ' + doc.id + ' • ' + (doc.type || 'DRIVE') + '</span>' +
+        '<span class="text-[11px] font-bold text-sky-600">Nạp file →</span></div>' +
+        '<div class="text-xs sm:text-sm font-extrabold text-slate-900">' + doc.title + '</div>' +
+        '<p class="text-xs text-slate-500 line-clamp-2">' + doc.summary + '</p></div>';
     }).join("");
-    if (list.length > 0 && !list.some(d => d.id === currentDocId)) {
+    if (list.length > 0 && !list.some(function(d) { return d.id === currentDocId; })) {
       openDocument(list[0].id);
     } else if (list.length > 0) {
       openDocument(currentDocId);
@@ -981,10 +1007,10 @@
   function openDocument(docId) {
     currentDocId = docId;
     const conf = CONFERENCES[currentConfKey];
-    const doc = conf.documents.find(d => d.id === docId) || conf.documents[0];
+    const doc = conf.documents.find(function(d) { return d.id === docId; }) || conf.documents[0];
     if (!doc) return;
     const embedUrl = toGoogleDriveEmbedUrl(doc.driveUrl);
-    document.getElementById("readerDocBadge").textContent = `${doc.id} • ${doc.type || 'DRIVE'}`;
+    document.getElementById("readerDocBadge").textContent = doc.id + " • " + (doc.type || "DRIVE");
     document.getElementById("readerDocTitle").textContent = doc.title;
     document.getElementById("readerDocContent").innerHTML = doc.body || doc.summary;
     document.getElementById("drivePreviewIframe").src = embedUrl;
@@ -994,29 +1020,26 @@
 
   function renderAgenda() {
     const conf = CONFERENCES[currentConfKey];
-    document.getElementById("agendaListContainer").innerHTML = conf.agenda.map(item => `
-      <div class="p-4 rounded-2xl border ${item.status === 'live' ? 'border-sky-400 bg-sky-50/50' : 'border-slate-200 bg-white'} flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <div>
-          <span class="text-xs font-extrabold text-sky-700 font-mono">${item.time}</span>
-          <div class="text-sm font-bold text-slate-900 mt-0.5">${item.title}</div>
-        </div>
-        ${item.actionTab ? `<button onclick="switchTab('${item.actionTab}')" class="px-3.5 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold shrink-0">${item.actionLabel} →</button>` : ''}
-      </div>
-    `).join("");
+    document.getElementById("agendaListContainer").innerHTML = conf.agenda.map(function(item) {
+      return '<div class="p-4 rounded-2xl border ' + (item.status === 'live' ? 'border-sky-400 bg-sky-50/50' : 'border-slate-200 bg-white') + ' flex flex-col sm:flex-row sm:items-center justify-between gap-2">' +
+        '<div><span class="text-xs font-extrabold text-sky-700 font-mono">' + item.time + '</span>' +
+        '<div class="text-sm font-bold text-slate-900 mt-0.5">' + item.title + '</div></div>' +
+        (item.actionTab ? '<button type="button" onclick="switchTab(\'' + item.actionTab + '\')" class="px-3.5 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold shrink-0 cursor-pointer">' + item.actionLabel + ' →</button>' : '') +
+        '</div>';
+    }).join("");
 
-    document.getElementById("speechQueueContainer").innerHTML = SPEECHES.map((s, idx) => `
-      <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-        <div><strong>#${idx + 1}. ${s.speaker}:</strong> ${s.topic}</div>
-        <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold shrink-0">${s.status}</span>
-      </div>
-    `).join("");
+    document.getElementById("speechQueueContainer").innerHTML = SPEECHES.map(function(s, idx) {
+      return '<div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">' +
+        '<div><strong>#' + (idx + 1) + '. ' + s.speaker + ':</strong> ' + s.topic + '</div>' +
+        '<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold shrink-0">' + s.status + '</span></div>';
+    }).join("");
   }
 
   function registerSpeech() {
     const topic = document.getElementById("speechTopicInput").value.trim();
     if (!topic) return showToast("⚠️ Vui lòng nhập chủ đề phát biểu!");
     const name = document.getElementById("currentUserName").textContent;
-    SPEECHES.push({ speaker: name, topic, status: "Chờ Đoàn Chủ tịch mời" });
+    SPEECHES.push({ speaker: name, topic: topic, status: "Chờ Đoàn Chủ tịch mời" });
     document.getElementById("speechTopicInput").value = "";
     renderAgenda();
     showToast("🎙️ Đã gửi đăng ký phát biểu lên Đoàn Chủ tịch!");
@@ -1025,18 +1048,15 @@
   function renderCandidates() {
     const conf = CONFERENCES[currentConfKey];
     document.getElementById("selectedCandidateCount").textContent = selectedCandidates.size;
-    document.getElementById("candidateListContainer").innerHTML = conf.candidates.map(c => {
+    document.getElementById("candidateListContainer").innerHTML = conf.candidates.map(function(c) {
       const checked = selectedCandidates.has(c.id);
-      return `
-        <div onclick="toggleCandidate('${c.id}')" class="cursor-pointer p-4 rounded-2xl border-2 transition flex items-center justify-between gap-3 ${checked ? 'border-sky-600 bg-sky-50/70' : 'border-slate-200 bg-white'}">
-          <div>
-            <div class="text-[11px] font-bold text-sky-700">${c.id} • ${c.unit}</div>
-            <div class="text-sm font-extrabold text-slate-900">${c.name}</div>
-            <div class="text-xs text-slate-500">${c.role}</div>
-          </div>
-          <div class="w-7 h-7 rounded-xl flex items-center justify-center font-bold text-sm ${checked ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-400'}">${checked ? '✓' : '+'}</div>
-        </div>
-      `;
+      return '<div onclick="toggleCandidate(\'' + c.id + '\')" class="cursor-pointer p-4 rounded-2xl border-2 transition flex items-center justify-between gap-3 ' +
+        (checked ? 'border-sky-600 bg-sky-50/70' : 'border-slate-200 bg-white') + '">' +
+        '<div><div class="text-[11px] font-bold text-sky-700">' + c.id + ' • ' + c.unit + '</div>' +
+        '<div class="text-sm font-extrabold text-slate-900">' + c.name + '</div>' +
+        '<div class="text-xs text-slate-500">' + c.role + '</div></div>' +
+        '<div class="w-7 h-7 rounded-xl flex items-center justify-center font-bold text-sm ' +
+        (checked ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-400') + '">' + (checked ? '✓' : '+') + '</div></div>';
     }).join("");
   }
 
@@ -1055,7 +1075,7 @@
     if (hasSubmittedBallot) return;
     selectedCandidates.clear();
     const conf = CONFERENCES[currentConfKey];
-    conf.candidates.slice(0, conf.maxPick).forEach(c => selectedCandidates.add(c.id));
+    conf.candidates.slice(0, conf.maxPick).forEach(function(c) { selectedCandidates.add(c.id); });
     renderCandidates();
   }
 
@@ -1063,7 +1083,7 @@
     const conf = CONFERENCES[currentConfKey];
     if (selectedCandidates.size !== conf.maxPick) return showToast("⚠️ Vui lòng chọn đúng " + conf.maxPick + " ứng viên!");
     hasSubmittedBallot = true;
-    conf.candidates.forEach(c => { if (selectedCandidates.has(c.id)) c.votes += 1; });
+    conf.candidates.forEach(function(c) { if (selectedCandidates.has(c.id)) c.votes += 1; });
     document.getElementById("ballotReceiptBox").classList.remove("hidden");
     document.getElementById("badgeVotedStatus").textContent = "Đã bầu";
     document.getElementById("badgeVotedStatus").className = "ml-auto text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300";
@@ -1073,27 +1093,23 @@
 
   function renderMotions() {
     const conf = CONFERENCES[currentConfKey];
-    document.getElementById("motionsListContainer").innerHTML = conf.motions.map(m => {
+    document.getElementById("motionsListContainer").innerHTML = conf.motions.map(function(m) {
       const total = m.agree + m.disagree + m.abstain || 1;
       const pct = Math.round((m.agree / total) * 100);
-      return `
-        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-3">
-          <div class="flex items-start justify-between gap-2">
-            <h4 class="text-sm font-extrabold text-slate-900">${m.title}</h4>
-            <span class="text-xs font-extrabold text-emerald-700">${pct}% Tán thành</span>
-          </div>
-          <div class="grid grid-cols-3 gap-2">
-            <button onclick="castMotionVote('${m.id}', 'agree')" class="py-2 rounded-xl text-xs font-bold border bg-white text-emerald-700 border-emerald-200">👍 Tán thành (${m.agree})</button>
-            <button onclick="castMotionVote('${m.id}', 'disagree')" class="py-2 rounded-xl text-xs font-bold border bg-white text-rose-700 border-rose-200">👎 Không (${m.disagree})</button>
-            <button onclick="castMotionVote('${m.id}', 'abstain')" class="py-2 rounded-xl text-xs font-bold border bg-white text-amber-800 border-amber-200">✋ Ý kiến khác (${m.abstain})</button>
-          </div>
-        </div>
-      `;
+      return '<div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-3">' +
+        '<div class="flex items-start justify-between gap-2">' +
+        '<h4 class="text-sm font-extrabold text-slate-900">' + m.title + '</h4>' +
+        '<span class="text-xs font-extrabold text-emerald-700">' + pct + '% Tán thành</span></div>' +
+        '<div class="grid grid-cols-3 gap-2">' +
+        '<button type="button" onclick="castMotionVote(\'' + m.id + '\', \'agree\')" class="py-2 rounded-xl text-xs font-bold border bg-white text-emerald-700 border-emerald-200 cursor-pointer">👍 Tán thành (' + m.agree + ')</button>' +
+        '<button type="button" onclick="castMotionVote(\'' + m.id + '\', \'disagree\')" class="py-2 rounded-xl text-xs font-bold border bg-white text-rose-700 border-rose-200 cursor-pointer">👎 Không (' + m.disagree + ')</button>' +
+        '<button type="button" onclick="castMotionVote(\'' + m.id + '\', \'abstain\')" class="py-2 rounded-xl text-xs font-bold border bg-white text-amber-800 border-amber-200 cursor-pointer">✋ Ý kiến khác (' + m.abstain + ')</button>' +
+        '</div></div>';
     }).join("");
   }
 
   function castMotionVote(id, choice) {
-    const m = CONFERENCES[currentConfKey].motions.find(x => x.id === id);
+    const m = CONFERENCES[currentConfKey].motions.find(function(x) { return x.id === id; });
     if (!m) return;
     m[choice] += 1;
     renderMotions();
@@ -1102,29 +1118,27 @@
 
   function renderTellerResults() {
     const conf = CONFERENCES[currentConfKey];
-    const sorted = [...conf.candidates].sort((a, b) => b.votes - a.votes);
-    document.getElementById("tellerResultsContainer").innerHTML = sorted.map((c, i) => `
-      <div class="p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between text-xs">
-        <span class="font-extrabold">#${i + 1}. ${c.name} (${c.unit})</span>
-        <span class="font-black text-emerald-700">${c.votes}/96 phiếu (${Math.round((c.votes/96)*100)}%)</span>
-      </div>
-    `).join("");
+    const sorted = conf.candidates.slice().sort(function(a, b) { return b.votes - a.votes; });
+    document.getElementById("tellerResultsContainer").innerHTML = sorted.map(function(c, i) {
+      return '<div class="p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between text-xs">' +
+        '<span class="font-extrabold">#' + (i + 1) + '. ' + c.name + ' (' + c.unit + ')</span>' +
+        '<span class="font-black text-emerald-700">' + c.votes + '/96 phiếu (' + Math.round((c.votes / 96) * 100) + '%)</span></div>';
+    }).join("");
   }
 
   function exportWordMinutes() {
     const conf = CONFERENCES[currentConfKey];
-    const sorted = [...conf.candidates].sort((a, b) => b.votes - a.votes);
-    const rows = sorted.map((c, i) => `<p>${i + 1}. Đồng chí <strong>${c.name}</strong> (${c.unit}): <strong>${c.votes}/96</strong> phiếu (${Math.round((c.votes/96)*100)}%)</p>`).join("");
-    const html = `<html><head><meta charset="utf-8"></head><body style="font-family:Times New Roman;font-size:14pt">
-      <h2 style="text-align:center">TRƯỜNG THPT HỒ THỊ BI<br>${conf.subtitle.toUpperCase()}</h2>
-      <h3 style="text-align:center">BIÊN BẢN KIỂM PHIẾU BẦU CỬ ĐIỆN TỬ</h3>
-      <p>Thời gian lập biên bản: ${new Date().toLocaleString("vi-VN")}</p>
-      ${rows}
-    </body></html>`;
+    const sorted = conf.candidates.slice().sort(function(a, b) { return b.votes - a.votes; });
+    const rows = sorted.map(function(c, i) {
+      return "<p>" + (i + 1) + ". Đồng chí <strong>" + c.name + "</strong> (" + c.unit + "): <strong>" + c.votes + "/96</strong> phiếu</p>";
+    }).join("");
+    const html = '<html><head><meta charset="utf-8"></head><body style="font-family:Times New Roman;font-size:14pt">' +
+      '<h2 style="text-align:center">TRƯỜNG THPT HỒ THỊ BI<br>' + conf.subtitle.toUpperCase() + '</h2>' +
+      '<h3 style="text-align:center">BIÊN BẢN KIỂM PHIẾU BẦU CỬ ĐIỆN TỬ</h3>' + rows + '</body></html>';
     const blob = new Blob([html], { type: "application/msword" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `Bien_Ban_Kiem_Phieu_${currentConfKey}.doc`;
+    a.download = "Bien_Ban_Kiem_Phieu_" + currentConfKey + ".doc";
     a.click();
     showToast("📄 Đã tải xuống Biên bản Kiểm phiếu (.DOC)");
   }
@@ -1132,35 +1146,36 @@
   function exportCsvResults() {
     const conf = CONFERENCES[currentConfKey];
     const lines = ["STT,Ma_UCV,Ho_Ten,Don_Vi,So_Phieu"];
-    conf.candidates.forEach((c, idx) => lines.push(`${idx + 1},${c.id},"${c.name}","${c.unit}",${c.votes}`));
-    const blob = new Blob(["﻿" + lines.join("
-")], { type: "text/csv;charset=utf-8;" });
+    conf.candidates.forEach(function(c, idx) {
+      lines.push((idx + 1) + "," + c.id + ",\"" + c.name + "\",\"" + c.unit + "\"," + c.votes);
+    });
+    const csvContent = "\uFEFF" + lines.join(String.fromCharCode(10));
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `Ket_Qua_Kiem_Phieu_${currentConfKey}.csv`;
+    a.download = "Ket_Qua_Kiem_Phieu_" + currentConfKey + ".csv";
     a.click();
     showToast("📊 Đã tải xuống bảng kết quả (.CSV)");
   }
 
   function renderRosterTable() {
     const q = (document.getElementById("rosterSearch")?.value || "").toLowerCase();
-    const filtered = DELEGATES.filter(d => d.name.toLowerCase().includes(q) || d.code.toLowerCase().includes(q));
-    document.getElementById("rosterListContainer").innerHTML = filtered.map(d => `
-      <div class="p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between text-xs bg-slate-50/40">
-        <div>
-          <span class="font-extrabold text-slate-900">${d.code} • ${d.name}</span>
-          <span class="text-slate-500 ml-2">(${d.group}) • Giờ quét: ${d.time}</span>
-        </div>
-        <button onclick="toggleDelegatePresent('${d.code}')" class="px-3 py-1.5 rounded-xl font-bold ${d.present ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-700'}">
-          ${d.present ? '✓ Có mặt' : 'Vắng mặt'}
-        </button>
-      </div>
-    `).join("");
+    const filtered = DELEGATES.filter(function(d) {
+      return d.name.toLowerCase().includes(q) || d.code.toLowerCase().includes(q);
+    });
+    document.getElementById("rosterListContainer").innerHTML = filtered.map(function(d) {
+      return '<div class="p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between text-xs bg-slate-50/40">' +
+        '<div><span class="font-extrabold text-slate-900">' + d.code + ' • ' + d.name + '</span>' +
+        '<span class="text-slate-500 ml-2">(' + d.group + ') • Giờ quét: ' + d.time + '</span></div>' +
+        '<button type="button" onclick="toggleDelegatePresent(\'' + d.code + '\')" class="px-3 py-1.5 rounded-xl font-bold cursor-pointer ' +
+        (d.present ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-700') + '">' +
+        (d.present ? '✓ Có mặt' : 'Vắng mặt') + '</button></div>';
+    }).join("");
     renderQrCards();
   }
 
   function toggleDelegatePresent(code) {
-    const d = DELEGATES.find(x => x.code === code);
+    const d = DELEGATES.find(function(x) { return x.code === code; });
     if (!d) return;
     d.present = !d.present;
     d.time = d.present ? new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) : "--:--";
@@ -1170,11 +1185,10 @@
   function importBulkDelegates() {
     const raw = document.getElementById("bulkDelegateInput").value.trim();
     if (!raw) return showToast("⚠️ Hãy dán dữ liệu đại biểu vào ô!");
-    const lines = raw.split(/?
-/);
+    const lines = raw.split(String.fromCharCode(10));
     let count = 0;
-    lines.forEach(line => {
-      const parts = line.split(/[|	,;]/).map(s => s.trim()).filter(Boolean);
+    lines.forEach(function(line) {
+      const parts = line.split(/[|;,\t]/).map(function(s) { return s.trim(); }).filter(Boolean);
       if (parts.length >= 2) {
         DELEGATES.push({
           code: parts[0].toUpperCase(),
@@ -1188,42 +1202,35 @@
     });
     document.getElementById("bulkDelegateInput").value = "";
     renderRosterTable();
-    showToast(`✅ Đã nạp thêm ${count} đại biểu!`);
+    showToast("✅ Đã nạp thêm " + count + " đại biểu!");
   }
 
   function renderQrCards() {
     const baseUrl = window.location.origin + window.location.pathname;
-    document.getElementById("qrCardsContainer").innerHTML = DELEGATES.map(d => {
-      const autoUrl = `${baseUrl}?qr=${encodeURIComponent(d.code)}`;
-      return `
-        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-1.5">
-          <div class="flex items-center justify-between">
-            <span class="text-[11px] font-mono font-extrabold px-2 py-0.5 rounded bg-sky-100 text-sky-800">${d.code}</span>
-            <span class="text-[10px] font-bold text-slate-500">THPT HỒ THỊ BI</span>
-          </div>
-          <div class="text-sm font-extrabold text-slate-900">${d.name}</div>
-          <div class="text-xs text-slate-500">${d.group}</div>
-          <div class="text-[10px] font-mono text-sky-700 break-all bg-white p-2 rounded-lg border border-slate-200">${autoUrl}</div>
-        </div>
-      `;
+    document.getElementById("qrCardsContainer").innerHTML = DELEGATES.map(function(d) {
+      const autoUrl = baseUrl + "?qr=" + encodeURIComponent(d.code);
+      return '<div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-1.5">' +
+        '<div class="flex items-center justify-between">' +
+        '<span class="text-[11px] font-mono font-extrabold px-2 py-0.5 rounded bg-sky-100 text-sky-800">' + d.code + '</span>' +
+        '<span class="text-[10px] font-bold text-slate-500">THPT HỒ THỊ BI</span></div>' +
+        '<div class="text-sm font-extrabold text-slate-900">' + d.name + '</div>' +
+        '<div class="text-xs text-slate-500">' + d.group + '</div>' +
+        '<div class="text-[10px] font-mono text-sky-700 break-all bg-white p-2 rounded-lg border border-slate-200">' + autoUrl + '</div></div>';
     }).join("");
   }
 
   function renderDuplicates() {
     document.getElementById("dupCountBadge").textContent = DUPLICATES.length;
-    document.getElementById("duplicateListContainer").innerHTML = DUPLICATES.map(item => `
-      <div class="p-4 rounded-2xl border border-rose-200 bg-rose-50/50 flex items-center justify-between gap-2 text-xs">
-        <div>
-          <div class="font-extrabold text-rose-900">${item.code} • ${item.name}</div>
-          <div class="text-slate-600">${item.devices}</div>
-        </div>
-        <button onclick="resolveDup('${item.id}')" class="px-3 py-1.5 rounded-xl bg-rose-600 text-white font-bold shrink-0">Khóa máy phụ</button>
-      </div>
-    `).join("");
+    document.getElementById("duplicateListContainer").innerHTML = DUPLICATES.map(function(item) {
+      return '<div class="p-4 rounded-2xl border border-rose-200 bg-rose-50/50 flex items-center justify-between gap-2 text-xs">' +
+        '<div><div class="font-extrabold text-rose-900">' + item.code + ' • ' + item.name + '</div>' +
+        '<div class="text-slate-600">' + item.devices + '</div></div>' +
+        '<button type="button" onclick="resolveDup(\'' + item.id + '\')" class="px-3 py-1.5 rounded-xl bg-rose-600 text-white font-bold shrink-0 cursor-pointer">Khóa máy phụ</button></div>';
+    }).join("");
   }
 
   function resolveDup(id) {
-    DUPLICATES = DUPLICATES.filter(x => x.id !== id);
+    DUPLICATES = DUPLICATES.filter(function(x) { return x.id !== id; });
     renderDuplicates();
     showToast("🛡️ Đã khóa thiết bị đăng nhập trùng!");
   }
@@ -1243,13 +1250,13 @@
   function startSpeechTimer(seconds) {
     clearInterval(speechTimerInterval);
     let rem = seconds;
-    const render = () => {
+    const render = function() {
       const m = String(Math.floor(rem / 60)).padStart(2, "0");
       const s = String(rem % 60).padStart(2, "0");
-      document.getElementById("stageTimerDisplay").textContent = `${m}:${s}`;
+      document.getElementById("stageTimerDisplay").textContent = m + ":" + s;
     };
     render();
-    speechTimerInterval = setInterval(() => {
+    speechTimerInterval = setInterval(function() {
       if (rem > 0) { rem--; render(); }
       else clearInterval(speechTimerInterval);
     }, 1000);
@@ -1265,12 +1272,12 @@
     localStorage.setItem(STORAGE_PREFIX + "WORKER_URL", wUrl);
     localStorage.setItem(STORAGE_PREFIX + "GAS_URL", gUrl);
     localStorage.setItem(STORAGE_PREFIX + "DRIVE_FOLDER_ID", fId);
-    showToast("💾 Đã lưu cấu hình Cloud độc lập V5.0!");
+    showToast("💾 Đã lưu cấu hình Cloud độc lập V5.1!");
   }
 
   function exportFullBackupJson() {
     const payload = {
-      version: "5.0.0-INDEPENDENT",
+      version: "5.1.0-INDEPENDENT",
       exportedAt: new Date().toISOString(),
       conferences: CONFERENCES,
       delegates: DELEGATES
@@ -1292,8 +1299,7 @@
     renderDuplicates();
   }
 
-  // Tự động nhận diện nếu đại biểu quét thẻ QR có sẵn tham số ?qr=HTB-001 trên URL
-  window.addEventListener("DOMContentLoaded", () => {
+  window.addEventListener("DOMContentLoaded", function() {
     renderAll();
     const params = new URLSearchParams(window.location.search);
     const qrCodeParam = params.get("qr");
