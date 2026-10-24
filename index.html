@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>HTB Đa Hội Nghị V5.1 - Bản Độc Lập (GitHub • Cloudflare • Google Drive)</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>HTB Đa Hội Nghị V5.2 - QR Cố Định • 4 Mẫu Sân Khấu LED • Bảo Mật Tài Khoản</title>
+  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=_GijyxAkRQwFBf8O08MBpm8RO0i-xCype5mvDLsw4nLWGWZ2C1SQgCjf60ACdNdoIjBb-GXVzSuRjkGa8M5ELWhBWWMpiHDfQnnGTdpRhsbMHWJXU6dHH8B7wWCwoBnRZwVT8x6jUBQTnD_JXQcTQ7xNm_ehCTzcnO7ew_bx_-Wn8L0ee1RIJ8p2_fj16eL4AKHUOnuVvBL9KxkHrmspHmd_T-DhOpS2kH6NyIgHCToRjo7PW21fZQVPXzBn3WvFcsuvXaXL-TUmU09D5wXUae3jUcvxt0dOawAfbSCqcg21Mas4nifJTzfdX36Dhjei" charset="UTF-8"></script><script src="https://cdn.tailwindcss.com"></script>
+  <script src="./config.js" onerror="console.log('Chạy cấu hình mặc định tích hợp sẵn')"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -16,31 +17,41 @@
       border-left: 4px solid #38BDF8;
     }
     .glass-header { background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(12px); }
-    .scan-line {
-      position: absolute; left: 8%; right: 8%; height: 3px;
-      background: linear-gradient(90deg, transparent, #38BDF8, #10B981, #38BDF8, transparent);
-      box-shadow: 0 0 12px #38BDF8;
-      animation: scanMove 2.2s ease-in-out infinite;
+
+    /* 4 MẪU MÀU SÂN KHẤU LED (STAGE THEMES) */
+    .stage-theme-youth {
+      background: radial-gradient(circle at top right, #0284c7 0%, #0f172a 45%, #020617 100%);
+      color: #ffffff;
     }
-    @keyframes scanMove {
-      0%, 100% { top: 10%; }
-      50% { top: 88%; }
+    .stage-theme-crimson {
+      background: radial-gradient(circle at top, #991b1b 0%, #7f1d1d 45%, #450a0a 100%);
+      color: #fef08a;
     }
+    .stage-theme-emerald {
+      background: radial-gradient(circle at top left, #047857 0%, #064e3b 50%, #022c22 100%);
+      color: #ffffff;
+    }
+    .stage-theme-royal {
+      background: radial-gradient(circle at center, #312e81 0%, #1e1b4b 55%, #090d16 100%);
+      color: #ffffff;
+    }
+
     @media print {
       .no-print { display: none !important; }
+      .print-only { display: block !important; }
     }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased selection:bg-sky-600 selection:text-white">
 
-<!-- ================= CỔNG ĐĂNG NHẬP & QUÉT QR 1 CHẠM ================= -->
+<!-- ================= CỔNG ĐIỂM DANH (MÃ QR CỐ ĐỊNH) & ĐĂNG NHẬP QUẢN TRỊ ================= -->
 <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-md p-3 sm:p-4 overflow-y-auto no-print">
-  <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-auto">
+  <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-auto">
     <div class="sidebar-gradient p-5 sm:p-6 text-white text-center relative">
-      <button type="button" onclick="closeAuthModal()" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center" title="Đóng cửa sổ">✕</button>
+      <button type="button" onclick="closeAuthModal()" id="closeAuthModalBtn" class="hidden absolute top-3 right-3 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold items-center justify-center cursor-pointer" title="Đóng cửa sổ">✕</button>
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-[11px] font-bold mb-2">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-        HTB ĐA HỘI NGHỊ V5.1 • BẢN ĐỘC LẬP MỚI
+        CỔNG ĐIỂM DANH QR CỐ ĐỊNH • V5.2
       </div>
       <h1 class="text-lg sm:text-xl font-black tracking-tight">TRƯỜNG THPT HỒ THỊ BI</h1>
       <p id="authConfSubtitle" class="text-xs text-sky-200/90 mt-1">Đại hội Đại biểu Đoàn TNCS Hồ Chí Minh nhiệm kỳ 2026 - 2027</p>
@@ -48,80 +59,136 @@
 
     <!-- Chuyển 3 phân quyền -->
     <div class="grid grid-cols-3 bg-slate-100 p-1.5 m-4 rounded-2xl text-xs font-bold">
-      <button type="button" onclick="switchAuthTab('delegate')" id="authTab-delegate" class="py-2.5 rounded-xl bg-white text-sky-700 shadow-sm transition cursor-pointer">📱 Đại biểu (QR)</button>
-      <button type="button" onclick="switchAuthTab('teller')" id="authTab-teller" class="py-2.5 rounded-xl text-slate-600 hover:text-slate-900 transition cursor-pointer">🗳️ Kiểm phiếu</button>
-      <button type="button" onclick="switchAuthTab('admin')" id="authTab-admin" class="py-2.5 rounded-xl text-slate-600 hover:text-slate-900 transition cursor-pointer">⚙️ Admin</button>
+      <button type="button" onclick="switchAuthTab('delegate')" id="authTab-delegate" class="py-2.5 rounded-xl bg-white text-sky-700 shadow-sm transition cursor-pointer">📍 Điểm danh Đại biểu</button>
+      <button type="button" onclick="switchAuthTab('teller')" id="authTab-teller" class="py-2.5 rounded-xl text-slate-600 hover:text-slate-900 transition cursor-pointer">🗳️ Ban Kiểm phiếu</button>
+      <button type="button" onclick="switchAuthTab('admin')" id="authTab-admin" class="py-2.5 rounded-xl text-slate-600 hover:text-slate-900 transition cursor-pointer">⚙️ Admin / Chủ tọa</button>
     </div>
 
-    <!-- TAB 1: ĐẠI BIỂU QUÉT QR VÀO THẲNG CHƯƠNG TRÌNH -->
+    <!-- TAB 1: ĐẠI BIỂU QUÉT MÃ QR CỐ ĐỊNH -> MỞ TRANG ĐIỂM DANH -->
     <div id="authPanel-delegate" class="px-5 pb-5 space-y-3.5">
-      <div class="relative bg-slate-900 rounded-2xl h-40 flex flex-col items-center justify-center text-white overflow-hidden border-2 border-sky-500/40">
-        <video id="qrVideoPreview" class="absolute inset-0 w-full h-full object-cover hidden" playsinline></video>
-        <div class="scan-line"></div>
-        <div class="relative z-10 w-20 h-20 border-2 border-dashed border-sky-400/80 rounded-2xl flex items-center justify-center bg-slate-950/40">
-          <span class="text-2xl">📷</span>
-        </div>
-        <p id="qrCameraStatus" class="relative z-10 text-xs text-sky-200 mt-2 font-medium px-4 text-center">Quét mã QR trên thẻ đại biểu để điểm danh & vào thẳng Chương trình</p>
-      </div>
-
-      <div class="grid grid-cols-2 gap-2">
-        <button type="button" onclick="startRealCameraScan()" class="py-3 px-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer">
-          <span>🎥 Bật Camera Quét</span>
-        </button>
-        <button type="button" onclick="quickQRLogin('HTB-001')" class="py-3 px-3 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold text-xs shadow-lg shadow-sky-600/30 flex items-center justify-center gap-1.5 cursor-pointer">
-          <span>⚡ Quét Nhanh (Demo)</span>
-        </button>
-      </div>
-
-      <div class="pt-2 border-t border-slate-100 space-y-2">
-        <label class="block text-xs font-bold text-slate-600">Hoặc chọn/nhập mã thẻ Đại biểu (HTB-001 → HTB-100):</label>
-        <div class="flex gap-2">
-          <select id="qrDelegateSelect" class="flex-1 rounded-xl border border-slate-200 px-3 py-2.5 text-xs font-semibold bg-slate-50">
-            <option value="HTB-001">HTB-001 • Nguyễn Minh Anh (Chi đoàn 12A1)</option>
-            <option value="HTB-002">HTB-002 • Trần Quốc Bảo (Chi đoàn 12A2)</option>
-            <option value="HTB-003">HTB-003 • Lê Hoàng Châu (Chi đoàn Giáo viên)</option>
-            <option value="HTB-004">HTB-004 • Phạm Tuấn Kiệt (Chi đoàn 11A1)</option>
-            <option value="HTB-005">HTB-005 • Võ Ngọc Phương Nghi (Chi đoàn 10A3)</option>
-          </select>
-          <button type="button" onclick="quickQRLogin(document.getElementById('qrDelegateSelect').value)" class="px-4 py-2.5 bg-sky-600 text-white text-xs font-extrabold rounded-xl hover:bg-sky-500 shrink-0 cursor-pointer">Vào ngay</button>
+      <div class="bg-sky-50 border border-sky-200 rounded-2xl p-3.5 flex items-start gap-3">
+        <div class="w-9 h-9 rounded-xl bg-sky-600 text-white flex items-center justify-center text-base shrink-0 font-bold">✓</div>
+        <div class="text-xs text-sky-950 space-y-0.5">
+          <div class="font-extrabold">Bạn đã kết nối qua Mã QR Cố Định của Đại hội!</div>
+          <p class="text-sky-800">Vui lòng tìm tên của bạn bên dưới hoặc nhập họ tên để xác nhận điểm danh và vào Chương trình Đại hội.</p>
         </div>
       </div>
+
+      <!-- Bộ lọc đơn vị & Tìm nhanh tên đại biểu -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <select id="checkinUnitFilter" onchange="renderCheckinCandidateList()" class="rounded-xl border border-slate-200 px-3 py-2.5 text-xs font-semibold bg-slate-50">
+          <option value="ALL">Tất cả Chi đoàn / Đơn vị</option>
+          <option value="Chi đoàn Giáo viên">Chi đoàn Giáo viên</option>
+          <option value="Chi đoàn 12A1">Chi đoàn 12A1</option>
+          <option value="Chi đoàn 12A2">Chi đoàn 12A2</option>
+          <option value="Chi đoàn 11A1">Chi đoàn 11A1</option>
+          <option value="Chi đoàn 10A3">Chi đoàn 10A3</option>
+        </select>
+        <input id="checkinNameSearch" oninput="renderCheckinCandidateList()" type="text" placeholder="🔍 Gõ tên hoặc mã đại biểu (VD: Minh Anh, HTB-001)..." class="sm:col-span-2 rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-sky-500" />
+      </div>
+
+      <!-- Danh sách đại biểu chạm để chọn điểm danh -->
+      <div id="checkinDelegateList" class="max-h-48 overflow-y-auto space-y-1.5 pr-1 border border-slate-200 rounded-2xl p-2 bg-slate-50/70"></div>
+
+      <!-- Nút mở khung tự nhập tên nếu đại biểu bổ sung -->
+      <div class="pt-1">
+        <button type="button" onclick="toggleSelfRegisterBox()" class="text-xs font-bold text-sky-700 hover:underline cursor-pointer">
+          ➕ Chưa có tên trong danh sách? Bấm vào đây để tự nhập tên điểm danh
+        </button>
+        <div id="selfRegisterBox" class="hidden mt-2 p-3 rounded-2xl bg-slate-100 border border-slate-200 space-y-2">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <input id="selfRegName" type="text" placeholder="Nhập Họ và tên của bạn..." class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white" />
+            <input id="selfRegUnit" type="text" placeholder="Chi đoàn / Tổ chuyên môn / Lớp..." class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white" />
+          </div>
+          <button type="button" onclick="submitSelfCheckin()" class="w-full py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold cursor-pointer">
+            ✅ Điểm danh bổ sung & Vào Đại hội
+          </button>
+        </div>
+      </div>
+
+      <!-- Nút xác nhận điểm danh chính -->
+      <button type="button" onclick="confirmSelectedCheckin()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-extrabold text-sm shadow-lg shadow-sky-600/30 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] transition">
+        <span>📍 XÁC NHẬN ĐIỂM DANH & VÀO CHƯƠNG TRÌNH</span>
+      </button>
     </div>
 
     <!-- TAB 2: TÀI KHOẢN BAN KIỂM PHIẾU -->
-    <div id="authPanel-teller" class="px-5 pb-5 space-y-3 hidden">
+    <div id="authPanel-teller" class="px-5 pb-6 space-y-3 hidden">
       <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3 text-xs text-amber-900">
-        <p class="font-bold">Tài khoản Ban Kiểm Phiếu:</p>
-        <p class="mt-0.5">• Trưởng ban: <code class="font-mono font-bold">kiemphiu</code> / Mật khẩu: <code class="font-mono font-bold">kp123</code></p>
-        <p>• Thư ký KP: <code class="font-mono font-bold">thukykp</code> / Mật khẩu: <code class="font-mono font-bold">kp123</code></p>
+        <p class="font-bold">Tài khoản Ban Kiểm Phiếu (Có thể đổi mật khẩu sau khi đăng nhập):</p>
+        <p class="mt-0.5">• Trưởng ban: <code class="font-mono font-bold">kiemphiu</code> / Mật khẩu mặc định: <code class="font-mono font-bold">kp123</code></p>
+        <p>• Thư ký KP: <code class="font-mono font-bold">thukykp</code> / Mật khẩu mặc định: <code class="font-mono font-bold">kp123</code></p>
       </div>
-      <input id="tellerUser" type="text" value="kiemphiu" placeholder="Tên đăng nhập" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold" />
-      <input id="tellerPass" type="password" value="kp123" placeholder="Mật khẩu" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold" />
+      <div>
+        <label class="text-xs font-bold text-slate-600">Tên tài khoản Ban Kiểm Phiếu</label>
+        <input id="tellerUser" type="text" value="kiemphiu" placeholder="Tên đăng nhập" class="w-full mt-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold" />
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-600">Mật khẩu</label>
+        <input id="tellerPass" type="password" value="kp123" placeholder="Mật khẩu" class="w-full mt-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold" />
+      </div>
       <button type="button" onclick="loginWithAccount('teller')" class="w-full py-3 rounded-2xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-sm shadow-lg shadow-amber-600/25 cursor-pointer">
         🗳️ Đăng nhập Ban Kiểm Phiếu
       </button>
     </div>
 
     <!-- TAB 3: TÀI KHOẢN ADMIN / ĐOÀN CHỦ TỊCH -->
-    <div id="authPanel-admin" class="px-5 pb-5 space-y-3 hidden">
+    <div id="authPanel-admin" class="px-5 pb-6 space-y-3 hidden">
       <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-3 text-xs text-indigo-900">
-        <p class="font-bold">Tài khoản Đoàn Chủ tịch / Admin:</p>
-        <p class="mt-0.5">• Quản trị: <code class="font-mono font-bold">admin</code> / Mật khẩu: <code class="font-mono font-bold">htb2025</code></p>
-        <p>• Chủ tọa: <code class="font-mono font-bold">chutoa</code> / Mật khẩu: <code class="font-mono font-bold">htb2025</code></p>
+        <p class="font-bold">Tài khoản Đoàn Chủ tịch / Admin (Hỗ trợ đổi mật khẩu):</p>
+        <p class="mt-0.5">• Quản trị: <code class="font-mono font-bold">admin</code> / Mật khẩu mặc định: <code class="font-mono font-bold">htb2025</code></p>
+        <p>• Chủ tọa: <code class="font-mono font-bold">chutoa</code> / Mật khẩu mặc định: <code class="font-mono font-bold">htb2025</code></p>
       </div>
-      <input id="adminUser" type="text" value="admin" placeholder="Tài khoản Admin" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold" />
-      <input id="adminPass" type="password" value="htb2025" placeholder="Mật khẩu" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold" />
+      <div>
+        <label class="text-xs font-bold text-slate-600">Tài khoản Admin / Chủ tọa</label>
+        <input id="adminUser" type="text" value="admin" placeholder="Tài khoản Admin" class="w-full mt-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold" />
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-600">Mật khẩu</label>
+        <input id="adminPass" type="password" value="htb2025" placeholder="Mật khẩu" class="w-full mt-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold" />
+      </div>
       <button type="button" onclick="loginWithAccount('admin')" class="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/25 cursor-pointer">
         ⚙️ Đăng nhập Admin Điều Hành
       </button>
     </div>
+  </div>
+</div>
 
-    <!-- Thanh Vào Nhanh 1 Chạm (Không cần nhập mật khẩu khi test) -->
-    <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex items-center justify-between gap-2 text-[11px]">
-      <span class="font-bold text-slate-500">Vào nhanh 1 chạm:</span>
-      <div class="flex gap-1.5">
-        <button type="button" onclick="enterDirectRole('teller')" class="px-2.5 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold cursor-pointer">🗳️ Vào Kiểm phiếu</button>
-        <button type="button" onclick="enterDirectRole('admin')" class="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold cursor-pointer">⚙️ Vào thẳng Admin</button>
+<!-- ================= MODAL ĐỔI MẬT KHẨU (DÀNH CHO ADMIN & BAN KIỂM PHIẾU) ================= -->
+<div id="passwordModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-xs p-4 no-print">
+  <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
+    <div class="sidebar-gradient p-5 text-white flex items-center justify-between">
+      <div>
+        <div class="text-[10px] font-bold uppercase tracking-wider text-sky-300">BẢO MẬT HỆ THỐNG</div>
+        <h3 class="text-base font-extrabold">🔑 Đổi Mật Khẩu Tài Khoản</h3>
+      </div>
+      <button type="button" onclick="closePasswordModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold cursor-pointer">✕</button>
+    </div>
+    <div class="p-5 space-y-3 text-xs">
+      <div class="p-3 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-between">
+        <span class="text-slate-600 font-semibold">Tài khoản đang chọn:</span>
+        <select id="changePassTargetUser" class="rounded-lg border border-slate-300 bg-white px-2.5 py-1 font-mono font-bold text-slate-900">
+          <option value="admin">admin (Quản trị viên)</option>
+          <option value="chutoa">chutoa (Đoàn Chủ tịch)</option>
+          <option value="kiemphiu">kiemphiu (Trưởng Ban KP)</option>
+          <option value="thukykp">thukykp (Thư ký KP)</option>
+        </select>
+      </div>
+      <div>
+        <label class="font-bold text-slate-700 block mb-1">Mật khẩu hiện tại</label>
+        <input id="oldPassInput" type="password" placeholder="Nhập mật khẩu cũ..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-semibold" />
+      </div>
+      <div>
+        <label class="font-bold text-slate-700 block mb-1">Mật khẩu mới (ít nhất 4 ký tự)</label>
+        <input id="newPassInput" type="password" placeholder="Nhập mật khẩu mới..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-semibold" />
+      </div>
+      <div>
+        <label class="font-bold text-slate-700 block mb-1">Xác nhận mật khẩu mới</label>
+        <input id="confirmPassInput" type="password" placeholder="Nhập lại mật khẩu mới..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-semibold" />
+      </div>
+      <div class="flex gap-2 pt-2">
+        <button type="button" onclick="closePasswordModal()" class="flex-1 py-2.5 rounded-xl border border-slate-200 font-bold text-slate-600 hover:bg-slate-50 cursor-pointer">Hủy</button>
+        <button type="button" onclick="saveNewPassword()" class="flex-1 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-extrabold cursor-pointer">💾 Lưu Mật Khẩu Mới</button>
       </div>
     </div>
   </div>
@@ -130,50 +197,117 @@
 <!-- LỚP PHỦ MỜ KHI MỞ MENU TRÁI TRÊN DI ĐỘNG -->
 <div id="sidebarBackdrop" onclick="closeMobileSidebar()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-30 hidden lg:hidden no-print"></div>
 
-<!-- ================= MÀN HÌNH TRÌNH CHIẾU SÂN KHẤU LED (FULLSCREEN) ================= -->
-<div id="stageLedModal" class="fixed inset-0 z-50 bg-slate-950 text-white hidden flex-col justify-between p-6 sm:p-10">
-  <div class="flex items-center justify-between border-b border-white/10 pb-4">
+<!-- ================= MÀN HÌNH TRÌNH CHIẾU SÂN KHẤU LED (4 MẪU + 4 BỐ CỤC) ================= -->
+<div id="stageLedModal" class="stage-theme-youth fixed inset-0 z-50 hidden flex-col justify-between p-5 sm:p-8 overflow-y-auto">
+  <!-- Header Sân khấu -->
+  <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/15 pb-4">
     <div class="flex items-center gap-4">
-      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center font-black text-2xl shadow-lg">HTB</div>
+      <div id="stageLogoBox" class="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center font-black text-2xl text-white shadow-lg border border-white/20">HTB</div>
       <div>
-        <div class="text-xs font-bold text-sky-400 tracking-widest uppercase">TRƯỜNG THPT HỒ THỊ BI • MÀN HÌNH ĐẠI HỘI LED</div>
+        <div class="text-xs font-extrabold tracking-widest uppercase opacity-80">TRƯỜNG THPT HỒ THỊ BI • MÀN HÌNH SÂN KHẤU ĐẠI HỘI</div>
         <h2 id="stageConfTitle" class="text-xl sm:text-3xl font-black mt-0.5">Đại hội Đại biểu Đoàn TNCS Hồ Chí Minh nhiệm kỳ 2026 - 2027</h2>
       </div>
     </div>
-    <button type="button" onclick="toggleStageLed(false)" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold cursor-pointer">✕ Thoát trình chiếu</button>
+
+    <!-- Thanh chọn nhanh 4 Mẫu màu & 4 Chế độ hiển thị Sân khấu -->
+    <div class="flex flex-wrap items-center gap-2">
+      <select id="stageThemeSelect" onchange="changeStageTheme(this.value)" class="bg-black/40 border border-white/20 text-white text-xs font-bold rounded-xl px-3 py-2">
+        <option value="youth">🎨 Mẫu 1: Xanh Đoàn Thanh Niên</option>
+        <option value="crimson">🚩 Mẫu 2: Đỏ Cờ - Vàng Sao Đại Hội</option>
+        <option value="emerald">🌿 Mẫu 3: Xanh Ngọc Lục Bảo</option>
+        <option value="royal">👑 Mẫu 4: Tím Hoàng Gia</option>
+      </select>
+      <div class="flex bg-black/40 p-1 rounded-xl border border-white/15 text-xs font-bold">
+        <button type="button" onclick="switchStageLayout('overview')" id="stLayout-overview" class="px-3 py-1.5 rounded-lg bg-white text-slate-900 cursor-pointer">1. Tổng quan</button>
+        <button type="button" onclick="switchStageLayout('qr')" id="stLayout-qr" class="px-3 py-1.5 rounded-lg text-white/80 hover:text-white cursor-pointer">2. QR Điểm danh</button>
+        <button type="button" onclick="switchStageLayout('chart')" id="stLayout-chart" class="px-3 py-1.5 rounded-lg text-white/80 hover:text-white cursor-pointer">3. Kết quả Bầu cử</button>
+        <button type="button" onclick="switchStageLayout('speaker')" id="stLayout-speaker" class="px-3 py-1.5 rounded-lg text-white/80 hover:text-white cursor-pointer">4. Diễn giả</button>
+      </div>
+      <button type="button" onclick="toggleFullScreenStage()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold cursor-pointer">⛶ Fullscreen</button>
+      <button type="button" onclick="toggleStageLed(false)" class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold cursor-pointer">✕ Đóng</button>
+    </div>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 my-auto py-6">
-    <div class="bg-white/5 border border-white/10 rounded-3xl p-6 text-center space-y-2">
-      <div class="text-xs font-bold uppercase text-sky-300">Tỷ lệ Đại biểu Có mặt</div>
-      <div id="stageQuorumPct" class="text-5xl sm:text-6xl font-black text-emerald-400">96%</div>
-      <div id="stageQuorumSub" class="text-sm text-slate-300">96 / 100 đại biểu chính thức (Đủ điều kiện khai mạc)</div>
+  <!-- BỐ CỤC SÂN KHẤU 1: TỔNG QUAN 3 CỘT KPI -->
+  <div id="stageLayoutPanel-overview" class="grid grid-cols-1 lg:grid-cols-3 gap-6 my-auto py-6">
+    <div class="bg-black/25 backdrop-blur-md border border-white/15 rounded-3xl p-7 text-center space-y-3 shadow-2xl">
+      <div class="text-xs font-extrabold uppercase tracking-wider opacity-80">Tỷ lệ Đại biểu Có mặt</div>
+      <div id="stageQuorumPct" class="text-6xl sm:text-7xl font-black text-emerald-400">96%</div>
+      <div id="stageQuorumSub" class="text-sm opacity-90 font-semibold">96 / 100 đại biểu chính thức (Đủ điều kiện khai mạc)</div>
     </div>
-    <div class="bg-white/5 border border-white/10 rounded-3xl p-6 text-center space-y-2">
-      <div class="text-xs font-bold uppercase text-amber-300">Tiến độ Bỏ phiếu Điện tử</div>
-      <div id="stageBallotCount" class="text-5xl sm:text-6xl font-black text-sky-400">92/96</div>
-      <div class="text-sm text-slate-300">100% phiếu hợp lệ • Mã hóa SHA-256</div>
+    <div class="bg-black/25 backdrop-blur-md border border-white/15 rounded-3xl p-7 text-center space-y-3 shadow-2xl">
+      <div class="text-xs font-extrabold uppercase tracking-wider opacity-80">Tiến độ Bỏ phiếu Điện tử</div>
+      <div id="stageBallotCount" class="text-6xl sm:text-7xl font-black text-sky-300">92/96</div>
+      <div class="text-sm opacity-90 font-semibold">100% phiếu hợp lệ • Bảo mật SHA-256</div>
     </div>
-    <div class="bg-white/5 border border-white/10 rounded-3xl p-6 text-center space-y-2">
-      <div class="text-xs font-bold uppercase text-rose-300">Đồng hồ Tham luận</div>
-      <div id="stageTimerDisplay" class="text-5xl sm:text-6xl font-black font-mono text-white">05:00</div>
-      <div class="flex justify-center gap-2 pt-2">
-        <button type="button" onclick="startSpeechTimer(300)" class="px-3 py-1 rounded-lg bg-sky-600 text-xs font-bold cursor-pointer">5 phút</button>
-        <button type="button" onclick="startSpeechTimer(180)" class="px-3 py-1 rounded-lg bg-emerald-600 text-xs font-bold cursor-pointer">3 phút</button>
-        <button type="button" onclick="stopSpeechTimer()" class="px-3 py-1 rounded-lg bg-rose-600 text-xs font-bold cursor-pointer">Dừng</button>
+    <div class="bg-black/25 backdrop-blur-md border border-white/15 rounded-3xl p-7 text-center space-y-3 shadow-2xl">
+      <div class="text-xs font-extrabold uppercase tracking-wider opacity-80">Đồng hồ Phiên Tham luận</div>
+      <div id="stageTimerDisplay" class="text-6xl sm:text-7xl font-black font-mono">05:00</div>
+      <div class="flex justify-center gap-2 pt-1">
+        <button type="button" onclick="startSpeechTimer(300)" class="px-3 py-1.5 rounded-xl bg-sky-600 text-white text-xs font-bold cursor-pointer">5 phút</button>
+        <button type="button" onclick="startSpeechTimer(180)" class="px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold cursor-pointer">3 phút</button>
+        <button type="button" onclick="stopSpeechTimer()" class="px-3 py-1.5 rounded-xl bg-rose-600 text-white text-xs font-bold cursor-pointer">Tạm dừng</button>
       </div>
     </div>
   </div>
 
-  <div class="text-center text-xs text-slate-400 border-t border-white/10 pt-4">
-    Hệ thống Điều hành Đa Hội Nghị V5.1 • Đồng bộ Thời gian thực qua Cloudflare D1 & Google Drive
+  <!-- BỐ CỤC SÂN KHẤU 2: MÃ QR CỐ ĐỊNH KHỔNG LỒ ĐỂ ĐẠI BIỂU QUÉT TỪ HỘI TRƯỜNG -->
+  <div id="stageLayoutPanel-qr" class="hidden grid-cols-1 lg:grid-cols-2 gap-8 my-auto py-4 items-center">
+    <div class="bg-white text-slate-900 rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center shadow-2xl max-w-md mx-auto w-full">
+      <span class="text-xs font-extrabold uppercase px-3 py-1 rounded-full bg-sky-100 text-sky-800 mb-2">MÃ QR ĐIỂM DANH CỐ ĐỊNH</span>
+      <h3 class="text-lg font-black text-slate-900">Quét Camera Zalo / Điện thoại để Điểm danh</h3>
+      <div class="my-4 p-4 bg-white rounded-2xl border-4 border-sky-600 shadow-md">
+        <img id="stageGiantQrImg" src="" alt="QR Điểm danh Đại hội" class="w-56 h-56 sm:w-64 sm:h-64 object-contain mx-auto" />
+      </div>
+      <p id="stageQrUrlText" class="text-xs font-mono font-bold text-sky-700 break-all bg-sky-50 px-3 py-2 rounded-xl border border-sky-200 w-full"></p>
+    </div>
+
+    <div class="bg-black/30 backdrop-blur-md border border-white/15 rounded-3xl p-6 sm:p-8 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xl font-black">🟢 Đại biểu vừa xác nhận điểm danh</h3>
+        <span id="stageLivePresentBadge" class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-extrabold">Có mặt: 4/5</span>
+      </div>
+      <div id="stageRecentCheckinList" class="space-y-2.5 max-h-80 overflow-y-auto"></div>
+    </div>
+  </div>
+
+  <!-- BỐ CỤC SÂN KHẤU 3: TRỰC TIẾP BẢNG KẾT QUẢ BẦU CỬ & BIỂU QUYẾT -->
+  <div id="stageLayoutPanel-chart" class="hidden my-auto py-4">
+    <div class="bg-black/30 backdrop-blur-md border border-white/15 rounded-3xl p-6 sm:p-8 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xl sm:text-2xl font-black">📊 Kết quả Kiểm phiếu Điện tử Trực tiếp</h3>
+        <span class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300">Cập nhật thời gian thực</span>
+      </div>
+      <div id="stageChartBarsContainer" class="space-y-3"></div>
+    </div>
+  </div>
+
+  <!-- BỐ CỤC SÂN KHẤU 4: MÀN HÌNH DIỄN GIẢ & ĐỒNG HỒ THAM LUẬN KHỔNG LỒ -->
+  <div id="stageLayoutPanel-speaker" class="hidden my-auto py-6 text-center space-y-6">
+    <div class="max-w-3xl mx-auto bg-black/30 backdrop-blur-md border border-white/15 rounded-3xl p-8 space-y-4 shadow-2xl">
+      <span class="px-4 py-1.5 rounded-full bg-amber-400/20 text-amber-300 text-xs font-extrabold uppercase tracking-widest">🎙️ ĐANG PHÁT BIỂU THAM LUẬN TẠI ĐẠI HỘI</span>
+      <h3 id="stageSpeakerName" class="text-2xl sm:text-4xl font-black">Đồng chí: Nguyễn Minh Anh (Chi đoàn 12A1)</h3>
+      <p id="stageSpeakerTopic" class="text-base sm:text-xl opacity-90 font-semibold">Chủ đề: Giải pháp ứng dụng AI và chuyển đổi số trong sinh hoạt Chi đoàn</p>
+      <div id="stageBigTimer2" class="text-7xl sm:text-8xl font-black font-mono text-emerald-400 py-2">05:00</div>
+      <div class="flex justify-center gap-3">
+        <button type="button" onclick="startSpeechTimer(300)" class="px-4 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold cursor-pointer">Bắt đầu 5 phút</button>
+        <button type="button" onclick="startSpeechTimer(180)" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold cursor-pointer">Bắt đầu 3 phút</button>
+        <button type="button" onclick="stopSpeechTimer()" class="px-4 py-2 rounded-xl bg-rose-600 text-white text-xs font-bold cursor-pointer">Dừng đồng hồ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Sân khấu -->
+  <div class="flex flex-wrap items-center justify-between text-xs opacity-75 border-t border-white/15 pt-3">
+    <span>Hệ thống Đa Hội Nghị V5.2 • Trường THPT Hồ Thị Bi</span>
+    <span id="stageClockNow">09:30 - 24/10/2026</span>
   </div>
 </div>
 
 <!-- ================= BỐ CỤC CHÍNH (SIDEBAR TRÁI + NỘI DUNG PHẢI) ================= -->
 <div class="min-h-screen flex">
 
-  <!-- THANH MENU BÊN TRÁI (ẨN HOÀN TOÀN TRÊN DI ĐỘNG, MỞ BẰNG NÚT ☰) -->
+  <!-- THANH MENU BÊN TRÁI (ẨN TRÊN DI ĐỘNG, MỞ BẰNG NÚT ☰) -->
   <aside id="leftSidebar" class="sidebar-gradient text-slate-100 w-72 fixed inset-y-0 left-0 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col justify-between shadow-2xl border-r border-sky-400/15 no-print">
     <div>
       <!-- Logo -->
@@ -182,7 +316,7 @@
           <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center font-black text-white shadow-md">HTB</div>
           <div>
             <div class="text-[11px] font-bold text-sky-300 tracking-wider">THPT HỒ THỊ BI</div>
-            <div class="text-sm font-extrabold text-white">ĐA HỘI NGHỊ V5.1</div>
+            <div class="text-sm font-extrabold text-white">ĐA HỘI NGHỊ V5.2</div>
           </div>
         </div>
         <button type="button" onclick="closeMobileSidebar()" class="lg:hidden p-2 rounded-xl bg-white/10 text-white hover:bg-white/20">✕</button>
@@ -199,17 +333,25 @@
         </select>
       </div>
 
-      <!-- Thông tin tài khoản đang đăng nhập -->
-      <div class="mx-4 mt-3 p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
-        <div class="truncate pr-2">
-          <div id="currentRoleBadge" class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-300">ĐẠI BIỂU CHÍNH THỨC</div>
-          <div id="currentUserName" class="text-xs font-bold text-white truncate">Nguyễn Minh Anh (HTB-001)</div>
+      <!-- Hộp Tài khoản Đang Đăng nhập + Nút Đổi MK & Đăng xuất -->
+      <div class="mx-4 mt-3 p-3 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+        <div class="flex items-center justify-between">
+          <span id="currentRoleBadge" class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-300">ĐẠI BIỂU CHÍNH THỨC</span>
+          <span class="text-[10px] text-sky-300 font-semibold">● Đã kết nối</span>
         </div>
-        <button type="button" onclick="openAuthModal()" class="px-2.5 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 text-[11px] font-bold shrink-0 border border-sky-400/30 cursor-pointer">Đổi TK</button>
+        <div id="currentUserName" class="text-xs font-extrabold text-white truncate">Nguyễn Minh Anh (HTB-001)</div>
+        <div class="grid grid-cols-2 gap-1.5 pt-1">
+          <button type="button" id="sidebarChangePassBtn" onclick="openPasswordModal()" class="hidden py-1.5 px-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 text-[11px] font-bold border border-amber-400/30 cursor-pointer text-center">
+            🔑 Đổi MK
+          </button>
+          <button type="button" onclick="logoutSession()" class="col-span-2 id-logout-btn py-1.5 px-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 text-[11px] font-bold border border-rose-400/30 cursor-pointer text-center">
+            🚪 Đăng xuất / Đổi người dùng
+          </button>
+        </div>
       </div>
 
       <!-- Danh sách Menu Trái -->
-      <div class="px-3 py-3 space-y-4 overflow-y-auto max-h-[calc(100vh-290px)]">
+      <div class="px-3 py-3 space-y-4 overflow-y-auto max-h-[calc(100vh-310px)]">
         <!-- NHÓM 1: ĐẠI BIỂU -->
         <div>
           <div class="px-3 mb-1.5 text-[10px] font-extrabold uppercase tracking-widest text-sky-300/75">Phân hệ Đại biểu</div>
@@ -242,29 +384,29 @@
             <button type="button" onclick="switchTab('ad-diemdan')" id="nav-ad-diemdan" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition cursor-pointer">
               <span>⚡</span><span>Điều hành & Điểm danh</span>
             </button>
+            <button type="button" onclick="switchTab('ad-theqr')" id="nav-ad-theqr" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition cursor-pointer">
+              <span>🖨️</span><span>Mã QR Cố Định Đại Hội</span>
+            </button>
             <button type="button" onclick="switchTab('ad-trunglap')" id="nav-ad-trunglap" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition cursor-pointer">
               <span>🛡️</span><span>Kiểm tra Trùng lặp</span>
               <span id="dupCountBadge" class="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-rose-500 text-white font-bold">2</span>
             </button>
-            <button type="button" onclick="switchTab('ad-theqr')" id="nav-ad-theqr" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition cursor-pointer">
-              <span>🖨️</span><span>Phôi Thẻ QR & Link Quét</span>
-            </button>
-            <button type="button" onclick="switchTab('ad-cloud')" id="nav-ad-cloud" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition cursor-pointer">
-              <span>🔗</span><span>Kết nối Cloud & Drive</span>
+            <button type="button" onclick="switchTab('ad-taikhoan')" id="nav-ad-taikhoan" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition cursor-pointer">
+              <span>🔐</span><span>Tài khoản & Đổi Mật khẩu</span>
             </button>
             <button type="button" onclick="toggleStageLed(true)" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-400/20 transition cursor-pointer">
-              <span>🖥️</span><span>Màn hình Sân khấu LED</span>
+              <span>🖥️</span><span>Màn hình Sân khấu LED (4 Mẫu)</span>
             </button>
           </nav>
         </div>
       </div>
     </div>
 
-    <!-- Thanh chuyển nhanh vai trò để kiểm thử -->
+    <!-- Thanh chuyển nhanh góc nhìn -->
     <div class="p-3.5 border-t border-white/10 bg-slate-950/40 space-y-2">
       <div class="flex items-center justify-between text-[10px] text-sky-200/80">
         <span>Chuyển nhanh góc nhìn:</span>
-        <span class="font-bold text-emerald-400">● Độc lập V5.1</span>
+        <span class="font-bold text-emerald-400">● V5.2</span>
       </div>
       <div class="grid grid-cols-3 gap-1.5 text-[11px] font-bold">
         <button type="button" onclick="quickSwitchRole('delegate')" id="roleBtn-delegate" class="py-1.5 rounded-lg bg-sky-500 text-white cursor-pointer">Đại biểu</button>
@@ -278,7 +420,6 @@
   <div class="flex-1 lg:pl-72 flex flex-col min-h-screen pb-20 lg:pb-8">
     <header class="glass-header sticky top-0 z-20 border-b border-slate-200/80 px-4 py-3 flex items-center justify-between shadow-xs no-print">
       <div class="flex items-center gap-3">
-        <!-- Nút mở Menu Trái trên Di động -->
         <button type="button" onclick="openMobileSidebar()" class="lg:hidden p-2.5 rounded-2xl bg-slate-900 text-white shadow-sm active:scale-95 transition cursor-pointer" aria-label="Mở menu">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 6h16M4 12h16M4 18h10"/>
@@ -287,23 +428,23 @@
         <div>
           <div class="flex items-center gap-2 flex-wrap">
             <span id="headerConfBadge" class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-sky-100 text-sky-800">ĐẠI HỘI ĐOÀN</span>
-            <span id="headerQuorumText" class="text-[11px] text-emerald-600 font-bold">● 96/100 Đại biểu có mặt (Đủ điều kiện)</span>
+            <span id="headerQuorumText" class="text-[11px] text-emerald-600 font-bold">● 96/100 Đại biểu có mặt</span>
           </div>
           <h2 id="headerTitle" class="text-sm sm:text-base font-extrabold text-slate-900 mt-0.5">Chương trình làm việc Đại hội</h2>
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
-        <button type="button" onclick="enterDirectRole('admin')" class="hidden sm:inline-flex px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold cursor-pointer">
-          ⚙️ Quyền Admin
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <button type="button" id="headerChangePassBtn" onclick="openPasswordModal()" class="hidden px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold cursor-pointer">
+          🔑 <span class="hidden sm:inline">Đổi MK</span>
         </button>
-        <button type="button" onclick="openAuthModal()" class="px-3 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 text-xs font-bold flex items-center gap-1.5 cursor-pointer">
-          <span>📷</span><span class="hidden sm:inline">Quét QR / Đổi TK</span>
+        <button type="button" onclick="logoutSession()" class="px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold flex items-center gap-1 cursor-pointer">
+          <span>🚪</span><span class="hidden sm:inline">Đăng xuất</span>
         </button>
       </div>
     </header>
 
-    <!-- Banner thông tin Đại biểu -->
+    <!-- Banner thông tin Đại biểu / Tài khoản hiện tại -->
     <div class="px-4 pt-4 max-w-5xl w-full mx-auto no-print">
       <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-sky-900 text-white rounded-3xl p-4 sm:p-5 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div class="flex items-center gap-3.5">
@@ -317,14 +458,14 @@
           </div>
         </div>
         <div class="flex items-center gap-2 self-start sm:self-center">
-          <span class="text-xs bg-white/10 px-3 py-1.5 rounded-xl font-semibold">Giờ vào: <strong id="bannerCheckinTime" class="text-sky-300">07:30</strong></span>
+          <span class="text-xs bg-white/10 px-3 py-1.5 rounded-xl font-semibold">Giờ điểm danh: <strong id="bannerCheckinTime" class="text-sky-300">07:30</strong></span>
         </div>
       </div>
     </div>
 
     <main class="px-4 py-4 max-w-5xl w-full mx-auto space-y-5 flex-1">
 
-      <!-- 1. TAB CHƯƠNG TRÌNH ĐẠI HỘI + ĐĂNG KÝ PHÁT BIỂU -->
+      <!-- 1. TAB CHƯƠNG TRÌNH ĐẠI HỘI -->
       <section id="tab-db-chuongtrinh" class="tab-panel space-y-4">
         <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-4">
           <div class="flex items-center justify-between">
@@ -341,13 +482,13 @@
           <h4 class="text-sm font-extrabold text-slate-900">🎙️ Đăng ký Phát biểu / Tham luận tại Hội trường</h4>
           <div class="flex flex-col sm:flex-row gap-2">
             <input id="speechTopicInput" type="text" placeholder="Nhập chủ đề tham luận hoặc ý kiến đóng góp..." class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold bg-slate-50" />
-            <button type="button" onclick="registerSpeech()" class="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shrink-0 cursor-pointer">Gửi đăng ký lên Đoàn Chủ tịch</button>
+            <button type="button" onclick="registerSpeech()" class="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shrink-0 cursor-pointer">Gửi đăng ký phát biểu</button>
           </div>
           <div id="speechQueueContainer" class="space-y-2 pt-1"></div>
         </div>
       </section>
 
-      <!-- 2. TAB VĂN KIỆN (LOAD TRỰC TIẾP TỪ GOOGLE DRIVE) -->
+      <!-- 2. TAB VĂN KIỆN (GOOGLE DRIVE) -->
       <section id="tab-db-vankien" class="tab-panel space-y-4 hidden">
         <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
@@ -365,7 +506,6 @@
             </div>
           </div>
 
-          <!-- Khung dán link Google Drive bất kỳ -->
           <div id="driveAddBox" class="hidden bg-sky-50/90 border border-sky-200 rounded-2xl p-4 space-y-3">
             <div class="flex items-center justify-between">
               <span class="text-xs font-extrabold text-sky-900">🔗 Dán Link File hoặc Thư mục từ Google Drive</span>
@@ -390,7 +530,6 @@
 
           <div id="documentListContainer" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
 
-          <!-- Khung xem trực tiếp Google Drive -->
           <div class="bg-slate-900 text-white rounded-3xl overflow-hidden border border-slate-800 shadow-lg">
             <div class="p-3.5 sm:px-5 bg-slate-950 flex flex-wrap items-center justify-between gap-2 border-b border-white/10">
               <div class="flex items-center gap-2 min-w-0">
@@ -406,16 +545,9 @@
 
             <div id="driveIframeWrapper" class="relative bg-slate-800 w-full h-[460px] sm:h-[560px]">
               <iframe id="drivePreviewIframe" src="" class="w-full h-full border-0 bg-white" allow="autoplay"></iframe>
-              <div class="bg-slate-900/95 px-4 py-2 text-[11px] text-sky-200 flex flex-wrap items-center justify-between gap-2 border-t border-white/10">
-                <span>💡 Đảm bảo file trên Google Drive đã bật quyền: <strong>"Bất kỳ ai có đường liên kết đều có thể xem"</strong>.</span>
-                <span id="driveEmbedUrlDisplay" class="font-mono text-[10px] text-slate-400 truncate max-w-xs"></span>
-              </div>
             </div>
 
             <div id="driveTextFallback" class="hidden bg-white text-slate-800 p-5 space-y-3">
-              <div class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl">
-                ⚡ Chế độ Đọc nhanh (Offline-ready) khi sóng 4G trong hội trường yếu.
-              </div>
               <div id="readerDocContent" class="text-xs sm:text-sm leading-relaxed space-y-2 text-slate-700"></div>
             </div>
           </div>
@@ -461,7 +593,7 @@
         </div>
       </section>
 
-      <!-- 5. TAB BAN KIỂM PHIẾU: GIÁM SÁT & XUẤT BIÊN BẢN WORD/CSV -->
+      <!-- 5. TAB BAN KIỂM PHIẾU -->
       <section id="tab-kp-kiemphiu" class="tab-panel space-y-4 hidden">
         <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-2">
@@ -469,7 +601,8 @@
               <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-800">BAN KIỂM PHIẾU</span>
               <h3 class="text-base font-extrabold text-slate-900 mt-1">📊 Tổng hợp Kết quả Kiểm phiếu & Xuất Biên bản</h3>
             </div>
-            <div class="flex gap-2">
+            <div class="flex flex-wrap gap-2">
+              <button type="button" onclick="openPasswordModal()" class="px-3.5 py-2 rounded-xl bg-amber-100 text-amber-900 text-xs font-bold cursor-pointer">🔑 Đổi mật khẩu KP</button>
               <button type="button" onclick="exportWordMinutes()" class="px-3.5 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold hover:bg-sky-500 cursor-pointer">📄 Xuất Biên bản (.DOC)</button>
               <button type="button" onclick="exportCsvResults()" class="px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 cursor-pointer">📊 Xuất Excel (.CSV)</button>
             </div>
@@ -478,7 +611,7 @@
         </div>
       </section>
 
-      <!-- 6. TAB ADMIN: ĐIỀU HÀNH & ĐIỂM DANH + NHẬP EXCEL -->
+      <!-- 6. TAB ADMIN: ĐIỀU HÀNH & ĐIỂM DANH -->
       <section id="tab-ad-diemdan" class="tab-panel space-y-4 hidden">
         <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-2">
@@ -501,53 +634,73 @@
         </div>
       </section>
 
-      <!-- 7. TAB ADMIN: KIỂM TRA TRÙNG LẶP -->
+      <!-- 7. TAB ADMIN: MÃ QR CỐ ĐỊNH DUY NHẤT CỦA ĐẠI HỘI -->
+      <section id="tab-ad-theqr" class="tab-panel space-y-4 hidden">
+        <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-xs border border-slate-200/80 space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+            <div>
+              <span class="text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-md bg-sky-100 text-sky-800">MÃ QR CỐ ĐỊNH DÙNG CHUNG TOÀN ĐẠI HỘI</span>
+              <h3 class="text-base sm:text-lg font-extrabold text-slate-900 mt-1">🖨️ Poster Mã QR Điểm Danh Cố Định</h3>
+              <p class="text-xs text-slate-500">Chỉ cần in 1 mã QR này dán tại bàn đón tiếp hoặc chiếu lên màn hình LED. Đại biểu quét vào sẽ mở thẳng trang chọn tên điểm danh.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" onclick="copyFixedCheckinUrl()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold cursor-pointer">📋 Copy Link Điểm danh</button>
+              <button type="button" onclick="openStageWithQr()" class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold cursor-pointer">🖥️ Chiếu QR lên Sân khấu LED</button>
+              <button type="button" onclick="window.print()" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold cursor-pointer">🖨️ In Poster QR (A4)</button>
+            </div>
+          </div>
+
+          <!-- Khung Poster QR Cố Định -->
+          <div class="max-w-md mx-auto bg-gradient-to-b from-slate-900 to-blue-950 text-white rounded-3xl p-6 sm:p-8 text-center shadow-xl border-4 border-sky-500/40 space-y-4">
+            <div class="text-xs font-bold text-sky-300 tracking-widest uppercase">TRƯỜNG THPT HỒ THỊ BI</div>
+            <h4 id="posterConfTitle" class="text-lg font-black leading-snug">ĐẠI HỘI ĐẠI BIỂU ĐOÀN TNCS HỒ CHÍ MINH</h4>
+            <div class="bg-white p-4 rounded-2xl inline-block shadow-lg">
+              <img id="fixedQrPosterImg" src="" alt="Mã QR Cố Định" class="w-56 h-56 object-contain mx-auto" />
+            </div>
+            <div class="space-y-1">
+              <div class="text-sm font-extrabold text-emerald-300">QUÉT MÃ QR ĐỂ ĐIỂM DANH & NHẬN VĂN KIỆN</div>
+              <p id="fixedCheckinUrlDisplay" class="text-[11px] font-mono text-sky-200 break-all bg-white/10 p-2 rounded-xl"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. TAB ADMIN: KIỂM TRA TRÙNG LẶP -->
       <section id="tab-ad-trunglap" class="tab-panel space-y-4 hidden">
         <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-4">
-          <h3 class="text-base font-extrabold text-slate-900">🛡️ Phát hiện & Khử trùng lặp thiết bị quét QR</h3>
+          <h3 class="text-base font-extrabold text-slate-900">🛡️ Phát hiện & Khử trùng lặp thiết bị điểm danh</h3>
           <div id="duplicateListContainer" class="space-y-3"></div>
         </div>
       </section>
 
-      <!-- 8. TAB ADMIN: PHÔI THẺ QR & LINK TỰ ĐỘNG ĐĂNG NHẬP -->
-      <section id="tab-ad-theqr" class="tab-panel space-y-4 hidden">
-        <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-4">
-          <div class="flex items-center justify-between">
+      <!-- 9. TAB ADMIN: QUẢN LÝ TÀI KHOẢN, ĐỔI MẬT KHẨU & CẤU HÌNH CLOUD -->
+      <section id="tab-ad-taikhoan" class="tab-panel space-y-4 hidden">
+        <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-xs border border-slate-200/80 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
             <div>
-              <h3 class="text-base font-extrabold text-slate-900">🖨️ Phôi Thẻ QR Đại biểu (Quét Camera Zalo/Điện thoại vào thẳng Chương trình)</h3>
-              <p class="text-xs text-slate-500">Mỗi mã QR chứa đường dẫn tự động đăng nhập dạng <code class="font-mono font-bold">?qr=HTB-001</code></p>
+              <span class="text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-md bg-indigo-100 text-indigo-800">BẢO MẬT & PHÂN QUYỀN</span>
+              <h3 class="text-base font-extrabold text-slate-900 mt-1">🔐 Quản lý Tài khoản Admin & Ban Kiểm Phiếu</h3>
             </div>
-            <button type="button" onclick="window.print()" class="px-4 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold cursor-pointer">🖨️ In danh sách thẻ QR</button>
-          </div>
-          <div id="qrCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
-        </div>
-      </section>
-
-      <!-- 9. TAB ADMIN: CẤU HÌNH KẾT NỐI GITHUB, CLOUDFLARE & GOOGLE DRIVE ĐỘC LẬP -->
-      <section id="tab-ad-cloud" class="tab-panel space-y-4 hidden">
-        <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-4">
-          <div>
-            <span class="text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-md bg-indigo-100 text-indigo-800">CẤU HÌNH HỆ THỐNG ĐỘC LẬP V5.1</span>
-            <h3 class="text-base font-extrabold text-slate-900 mt-1">🔗 Kết nối Cloudflare Worker (D1) & Google Drive</h3>
-            <p class="text-xs text-slate-500">Tách biệt hoàn toàn dữ liệu với trang cũ <code class="font-mono">daihoi-doan-hothibi</code></p>
+            <button type="button" onclick="openPasswordModal()" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold cursor-pointer">🔑 Đổi mật khẩu ngay</button>
           </div>
 
-          <div class="space-y-3 text-xs">
-            <div>
-              <label class="font-bold text-slate-700 block mb-1">1. URL Cloudflare Worker API mới (Độc lập):</label>
-              <input id="cfgWorkerUrl" type="text" placeholder="https://htb-hoinghi-v5-api.ten-ban.workers.dev" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono" />
+          <div id="accountManagerList" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs"></div>
+
+          <div class="pt-4 border-t border-slate-100 space-y-3 text-xs">
+            <h4 class="text-sm font-extrabold text-slate-900">🔗 Kết nối Cloudflare Worker (D1) & Thư mục Google Drive</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">URL Cloudflare Worker API:</label>
+                <input id="cfgWorkerUrl" type="text" placeholder="https://htb-hoinghi-v5-api.ten-ban.workers.dev" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-mono" />
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">ID Thư mục Google Drive chứa Văn kiện:</label>
+                <input id="cfgDriveFolderId" type="text" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-mono" />
+              </div>
             </div>
-            <div>
-              <label class="font-bold text-slate-700 block mb-1">2. URL Google Apps Script đồng bộ Thư mục Drive (Tùy chọn):</label>
-              <input id="cfgGasUrl" type="text" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono" />
-            </div>
-            <div>
-              <label class="font-bold text-slate-700 block mb-1">3. ID Thư mục Google Drive chứa Văn kiện Đại hội:</label>
-              <input id="cfgDriveFolderId" type="text" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono" />
-            </div>
-            <div class="flex flex-wrap gap-2 pt-2">
-              <button type="button" onclick="saveCloudConfig()" class="px-4 py-2.5 rounded-xl bg-sky-600 text-white font-bold cursor-pointer">💾 Lưu Cấu hình Kết nối</button>
-              <button type="button" onclick="exportFullBackupJson()" class="px-4 py-2.5 rounded-xl bg-slate-900 text-white font-bold cursor-pointer">📦 Xuất Toàn bộ Dữ liệu (.JSON)</button>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" onclick="saveCloudConfig()" class="px-4 py-2.5 rounded-xl bg-slate-900 text-white font-bold cursor-pointer">💾 Lưu Cấu hình</button>
+              <button type="button" onclick="resetDefaultAccounts()" class="px-4 py-2.5 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 font-bold cursor-pointer">🔄 Khôi phục Mật khẩu Mặc định</button>
             </div>
           </div>
         </div>
@@ -577,35 +730,59 @@
 
 <script>
   window.HTB_CONFIG = window.HTB_CONFIG || {
-    APP_VERSION: "5.1.0-INDEPENDENT",
+    APP_VERSION: "5.2.0-INDEPENDENT",
     STORAGE_PREFIX: "HTB_V5_IND_",
     GOOGLE_DRIVE_FOLDER_ID: "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
   };
-  const STORAGE_PREFIX = window.HTB_CONFIG.STORAGE_PREFIX || "HTB_V5_IND_";
+  var STORAGE_PREFIX = window.HTB_CONFIG.STORAGE_PREFIX || "HTB_V5_IND_";
+
+  // Quản lý Tài khoản Admin & Ban Kiểm Phiếu (Hỗ trợ đổi mật khẩu lưu vào localStorage)
+  var DEFAULT_ACCOUNTS = {
+    admin:    { username: "admin",    pass: "htb2025", role: "admin",  title: "Quản trị viên Hệ thống" },
+    chutoa:   { username: "chutoa",   pass: "htb2025", role: "admin",  title: "Đoàn Chủ tịch Điều hành" },
+    kiemphiu: { username: "kiemphiu", pass: "kp123",   role: "teller", title: "Trưởng Ban Kiểm Phiếu" },
+    thukykp:  { username: "thukykp",  pass: "kp123",   role: "teller", title: "Thư ký Ban Kiểm Phiếu" }
+  };
+
+  function getAccountsStore() {
+    try {
+      var raw = localStorage.getItem(STORAGE_PREFIX + "ACCOUNTS");
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return JSON.parse(JSON.stringify(DEFAULT_ACCOUNTS));
+  }
+
+  function saveAccountsStore(store) {
+    localStorage.setItem(STORAGE_PREFIX + "ACCOUNTS", JSON.stringify(store));
+  }
+
+  var ACCOUNTS = getAccountsStore();
+  var currentLoggedInAccount = null; // Lưu username nếu đăng nhập bằng Admin / Kiểm phiếu
+  var selectedCheckinCode = "HTB-001";
 
   function toGoogleDriveEmbedUrl(rawUrl) {
     if (!rawUrl) return "";
-    const url = rawUrl.trim();
-    const docsMatch = url.match(/docs\.google\.com\/(document|presentation|spreadsheets)\/d\/([a-zA-Z0-9_-]+)/);
+    var url = rawUrl.trim();
+    var docsMatch = url.match(/docs\.google\.com\/(document|presentation|spreadsheets)\/d\/([a-zA-Z0-9_-]+)/);
     if (docsMatch) return "https://docs.google.com/" + docsMatch[1] + "/d/" + docsMatch[2] + "/preview";
-    const fileMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+    var fileMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
     if (fileMatch) return "https://drive.google.com/file/d/" + fileMatch[1] + "/preview";
-    const idParamMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    var idParamMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
     if (idParamMatch) return "https://drive.google.com/file/d/" + idParamMatch[1] + "/preview";
-    const folderMatch = url.match(/drive\.google\.com\/drive\/(?:u\/\d+\/)?folders\/([a-zA-Z0-9_-]+)/);
+    var folderMatch = url.match(/drive\.google\.com\/drive\/(?:u\/\d+\/)?folders\/([a-zA-Z0-9_-]+)/);
     if (folderMatch) return "https://drive.google.com/embeddedfolderview?id=" + folderMatch[1] + "#list";
     if (/^[a-zA-Z0-9_-]{20,}$/.test(url)) return "https://drive.google.com/file/d/" + url + "/preview";
     return url;
   }
 
-  const CONFERENCES = {
+  var CONFERENCES = {
     doan: {
       badge: "ĐẠI HỘI ĐOÀN",
       subtitle: "Đại hội Đại biểu Đoàn TNCS Hồ Chí Minh nhiệm kỳ 2026 - 2027",
       ballotTitle: "Bầu Ban Chấp hành Đoàn trường nhiệm kỳ 2026 - 2027",
       maxPick: 5,
       agenda: [
-        { time: "07:00 - 07:30", title: "Đón tiếp đại biểu, quét mã QR điểm danh & đồng bộ Văn kiện Google Drive", status: "done", actionTab: null },
+        { time: "07:00 - 07:30", title: "Đón tiếp đại biểu, quét Mã QR Cố Định điểm danh & nhận tài liệu số", status: "done", actionTab: null },
         { time: "08:15 - 09:15", title: "Trình bày Báo cáo chính trị & Phương hướng nhiệm kỳ (Đọc trên Google Drive)", status: "live", actionTab: "db-vankien", actionLabel: "Mở Văn kiện Drive" },
         { time: "09:15 - 10:00", title: "Bầu cử Ban Chấp hành Đoàn trường nhiệm kỳ mới", status: "upcoming", actionTab: "db-baucu", actionLabel: "Vào Bầu cử" },
         { time: "10:00 - 10:45", title: "Biểu quyết thông qua Nghị quyết Đại hội", status: "upcoming", actionTab: "db-bieuquyet", actionLabel: "Biểu quyết" }
@@ -715,7 +892,7 @@
     }
   };
 
-  let DELEGATES = [
+  var DELEGATES = [
     { code: "HTB-001", name: "Nguyễn Minh Anh", group: "Chi đoàn 12A1", present: true, time: "07:12" },
     { code: "HTB-002", name: "Trần Quốc Bảo", group: "Chi đoàn 12A2", present: true, time: "07:15" },
     { code: "HTB-003", name: "Lê Hoàng Châu", group: "Chi đoàn Giáo viên", present: true, time: "07:18" },
@@ -723,28 +900,28 @@
     { code: "HTB-005", name: "Võ Ngọc Phương Nghi", group: "Chi đoàn 10A3", present: true, time: "07:22" }
   ];
 
-  let DUPLICATES = [
+  var DUPLICATES = [
     { id: "DUP-1", code: "HTB-014", name: "Đặng Quốc Huy (12A4)", devices: "iPhone 15 (07:14) & Redmi Note 13 (07:19)" },
     { id: "DUP-2", code: "HTB-029", name: "Lương Bảo Ngọc (11A2)", devices: "Samsung S23 (07:16) & iPad Safari (07:21)" }
   ];
 
-  let SPEECHES = [
-    { speaker: "Nguyễn Minh Anh (12A1)", topic: "Giải pháp ứng dụng AI và chuyển đổi số trong sinh hoạt Chi đoàn", status: "Đã duyệt phát biểu" }
+  var SPEECHES = [
+    { speaker: "Nguyễn Minh Anh (Chi đoàn 12A1)", topic: "Giải pháp ứng dụng AI và chuyển đổi số trong sinh hoạt Chi đoàn", status: "Đang trình bày" }
   ];
 
-  let currentConfKey = "doan";
-  let currentDocId = "VK-01";
-  let selectedCandidates = new Set();
-  let hasSubmittedBallot = false;
-  let speechTimerInterval = null;
+  var currentConfKey = "doan";
+  var currentDocId = "VK-01";
+  var selectedCandidates = new Set();
+  var hasSubmittedBallot = false;
+  var speechTimerInterval = null;
 
   function showToast(msg) {
-    const box = document.getElementById("toastBox");
+    var box = document.getElementById("toastBox");
     if (!box) return;
     box.textContent = msg;
     box.classList.remove("hidden");
     clearTimeout(window._toastTimer);
-    window._toastTimer = setTimeout(function() { box.classList.add("hidden"); }, 3000);
+    window._toastTimer = setTimeout(function() { box.classList.add("hidden"); }, 3200);
   }
 
   function openMobileSidebar() {
@@ -756,6 +933,7 @@
     document.getElementById("sidebarBackdrop").classList.add("hidden");
   }
   function openAuthModal() {
+    renderCheckinCandidateList();
     document.getElementById("authModal").classList.remove("hidden");
   }
   function closeAuthModal() {
@@ -764,8 +942,8 @@
 
   function switchAuthTab(tab) {
     ["delegate", "teller", "admin"].forEach(function(t) {
-      const panel = document.getElementById("authPanel-" + t);
-      const btn = document.getElementById("authTab-" + t);
+      var panel = document.getElementById("authPanel-" + t);
+      var btn = document.getElementById("authTab-" + t);
       if (panel) panel.classList.toggle("hidden", t !== tab);
       if (btn) {
         btn.className = (t === tab)
@@ -775,102 +953,234 @@
     });
   }
 
-  function enterDirectRole(role) {
-    if (role === "admin") {
-      document.getElementById("currentUserName").textContent = "Quản trị viên Hệ thống (Admin)";
-    } else if (role === "teller") {
-      document.getElementById("currentUserName").textContent = "Trưởng Ban Kiểm Phiếu";
-    }
-    quickSwitchRole(role, false);
-    closeAuthModal();
+  // ================= ĐIỂM DANH QUA MÃ QR CỐ ĐỊNH =================
+  function getFixedCheckinUrl() {
+    var base = window.location.origin + window.location.pathname;
+    return base + "?checkin=1";
   }
 
-  async function startRealCameraScan() {
-    const video = document.getElementById("qrVideoPreview");
-    const status = document.getElementById("qrCameraStatus");
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      showToast("⚠️ Trình duyệt đang chặn Camera, đã chuyển sang quét nhanh!");
-      quickQRLogin("HTB-001");
+  function renderCheckinCandidateList() {
+    var unitFilter = document.getElementById("checkinUnitFilter")?.value || "ALL";
+    var q = (document.getElementById("checkinNameSearch")?.value || "").toLowerCase().trim();
+    var list = DELEGATES.filter(function(d) {
+      var matchUnit = (unitFilter === "ALL") || (d.group === unitFilter);
+      var matchQuery = !q || d.name.toLowerCase().includes(q) || d.code.toLowerCase().includes(q) || d.group.toLowerCase().includes(q);
+      return matchUnit && matchQuery;
+    });
+
+    var container = document.getElementById("checkinDelegateList");
+    if (!container) return;
+    if (list.length === 0) {
+      container.innerHTML = '<div class="p-4 text-center text-xs text-slate-500">Không tìm thấy tên phù hợp. Bạn có thể bấm nút "Tự nhập tên điểm danh" bên dưới!</div>';
       return;
     }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-      video.srcObject = stream;
-      video.classList.remove("hidden");
-      await video.play();
-      status.textContent = "Đang bật Camera quét QR... Đưa thẻ vào khung ngắm";
-      setTimeout(function() {
-        stream.getTracks().forEach(function(t) { t.stop(); });
-        video.classList.add("hidden");
-        quickQRLogin("HTB-001");
-      }, 2000);
-    } catch (e) {
-      quickQRLogin("HTB-001");
-    }
+
+    container.innerHTML = list.map(function(d) {
+      var isSelected = (d.code === selectedCheckinCode);
+      return '<div onclick="selectDelegateForCheckin(\'' + d.code + '\')" class="cursor-pointer p-3 rounded-xl border transition flex items-center justify-between ' +
+        (isSelected ? 'border-sky-600 bg-sky-100/80 shadow-xs' : 'border-slate-200 bg-white hover:border-sky-300') + '">' +
+        '<div><div class="text-xs font-extrabold text-slate-900">' + d.name + ' <span class="font-mono text-sky-700">(' + d.code + ')</span></div>' +
+        '<div class="text-[11px] text-slate-500">' + d.group + '</div></div>' +
+        '<div class="flex items-center gap-2">' +
+        (d.present ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">Đã có mặt ' + d.time + '</span>' : '<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800">Chưa điểm danh</span>') +
+        '<span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ' + (isSelected ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-400') + '">✓</span>' +
+        '</div></div>';
+    }).join("");
   }
 
-  function quickQRLogin(code) {
-    const cleanCode = String(code || "HTB-001").trim().toUpperCase();
-    let found = DELEGATES.find(function(d) { return d.code === cleanCode; });
-    if (!found) {
-      found = { code: cleanCode, name: "Đại biểu " + cleanCode, group: "Đại biểu chính thức", present: true, time: "07:30" };
-      DELEGATES.unshift(found);
-    }
+  function selectDelegateForCheckin(code) {
+    selectedCheckinCode = code;
+    renderCheckinCandidateList();
+  }
+
+  function toggleSelfRegisterBox() {
+    document.getElementById("selfRegisterBox").classList.toggle("hidden");
+  }
+
+  function submitSelfCheckin() {
+    var name = document.getElementById("selfRegName").value.trim();
+    var unit = document.getElementById("selfRegUnit").value.trim() || "Đại biểu chính thức";
+    if (!name) return showToast("⚠️ Vui lòng nhập Họ và tên của bạn!");
+    var newCode = "HTB-" + String(DELEGATES.length + 1).padStart(3, "0");
+    var newDel = { code: newCode, name: name, group: unit, present: true, time: "07:30" };
+    DELEGATES.unshift(newDel);
+    selectedCheckinCode = newCode;
+    confirmSelectedCheckin();
+  }
+
+  function confirmSelectedCheckin() {
+    var found = DELEGATES.find(function(d) { return d.code === selectedCheckinCode; }) || DELEGATES[0];
     found.present = true;
-    const now = new Date();
+    var now = new Date();
     found.time = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
 
+    currentLoggedInAccount = null;
     document.getElementById("bannerDelegateCode").textContent = found.code + " • ĐÃ ĐIỂM DANH";
     document.getElementById("bannerDelegateGroup").textContent = found.group;
     document.getElementById("bannerDelegateName").textContent = "Đại biểu: " + found.name;
     document.getElementById("bannerCheckinTime").textContent = found.time;
     document.getElementById("currentUserName").textContent = found.name + " (" + found.code + ")";
+    document.getElementById("closeAuthModalBtn").classList.remove("hidden");
+    document.getElementById("closeAuthModalBtn").classList.add("flex");
 
+    updatePasswordButtonsVisibility();
     quickSwitchRole("delegate", true);
     closeAuthModal();
     switchTab("db-chuongtrinh");
     renderRosterTable();
-    showToast("✅ Điểm danh QR thành công: " + found.name);
+    showToast("✅ Điểm danh thành công! Chào mừng đại biểu " + found.name);
   }
 
+  // ================= ĐĂNG NHẬP, ĐĂNG XUẤT & ĐỔI MẬT KHẨU =================
   function loginWithAccount(role) {
+    ACCOUNTS = getAccountsStore();
     if (role === "teller") {
-      const u = document.getElementById("tellerUser").value.trim();
-      const p = document.getElementById("tellerPass").value.trim();
-      if ((u === "kiemphiu" || u === "thukykp") && p === "kp123") {
-        document.getElementById("currentUserName").textContent = "Ban Kiểm Phiếu (" + u + ")";
+      var u = document.getElementById("tellerUser").value.trim().toLowerCase();
+      var p = document.getElementById("tellerPass").value.trim();
+      var acc = ACCOUNTS[u];
+      if (acc && acc.role === "teller" && acc.pass === p) {
+        currentLoggedInAccount = u;
+        document.getElementById("currentUserName").textContent = acc.title + " (" + u + ")";
+        document.getElementById("bannerDelegateCode").textContent = "BAN KIỂM PHIẾU";
+        document.getElementById("bannerDelegateGroup").textContent = "Tài khoản: " + u;
+        document.getElementById("bannerDelegateName").textContent = acc.title;
+        document.getElementById("closeAuthModalBtn").classList.remove("hidden");
+        document.getElementById("closeAuthModalBtn").classList.add("flex");
+        updatePasswordButtonsVisibility();
         quickSwitchRole("teller", true);
         closeAuthModal();
-        showToast("🗳️ Đã đăng nhập quyền Ban Kiểm Phiếu");
+        showToast("🗳️ Đăng nhập thành công: " + acc.title);
       } else {
-        showToast("⚠️ Sai mật khẩu (kiemphiu / kp123)");
+        showToast("⚠️ Sai tên đăng nhập hoặc mật khẩu Ban Kiểm Phiếu!");
       }
     } else {
-      const u = document.getElementById("adminUser").value.trim();
-      const p = document.getElementById("adminPass").value.trim();
-      if ((u === "admin" || u === "chutoa") && p === "htb2025") {
-        document.getElementById("currentUserName").textContent = "Quản trị viên (" + u + ")";
+      var u2 = document.getElementById("adminUser").value.trim().toLowerCase();
+      var p2 = document.getElementById("adminPass").value.trim();
+      var acc2 = ACCOUNTS[u2];
+      if (acc2 && acc2.role === "admin" && acc2.pass === p2) {
+        currentLoggedInAccount = u2;
+        document.getElementById("currentUserName").textContent = acc2.title + " (" + u2 + ")";
+        document.getElementById("bannerDelegateCode").textContent = "BAN ĐIỀU HÀNH • ADMIN";
+        document.getElementById("bannerDelegateGroup").textContent = "Tài khoản: " + u2;
+        document.getElementById("bannerDelegateName").textContent = acc2.title;
+        document.getElementById("closeAuthModalBtn").classList.remove("hidden");
+        document.getElementById("closeAuthModalBtn").classList.add("flex");
+        updatePasswordButtonsVisibility();
         quickSwitchRole("admin", true);
         closeAuthModal();
-        showToast("⚙️ Đã đăng nhập quyền Admin Điều Hành");
+        showToast("⚙️ Đăng nhập thành công: " + acc2.title);
       } else {
-        showToast("⚠️ Sai mật khẩu (admin / htb2025)");
+        showToast("⚠️ Sai tài khoản hoặc mật khẩu Admin!");
       }
     }
   }
 
+  function updatePasswordButtonsVisibility() {
+    var hasAccount = Boolean(currentLoggedInAccount);
+    var sideBtn = document.getElementById("sidebarChangePassBtn");
+    var headBtn = document.getElementById("headerChangePassBtn");
+    if (sideBtn) sideBtn.classList.toggle("hidden", !hasAccount);
+    if (headBtn) headBtn.classList.toggle("hidden", !hasAccount);
+  }
+
+  function logoutSession() {
+    currentLoggedInAccount = null;
+    updatePasswordButtonsVisibility();
+    closeMobileSidebar();
+    document.getElementById("MenuGroup-management")?.classList.add("hidden");
+    document.getElementById("tellerPass").value = "";
+    document.getElementById("adminPass").value = "";
+    openAuthModal();
+    showToast("🚪 Đã đăng xuất khỏi phiên làm việc hiện tại!");
+  }
+
+  function openPasswordModal(targetUser) {
+    var selectEl = document.getElementById("changePassTargetUser");
+    if (targetUser) {
+      selectEl.value = targetUser;
+    } else if (currentLoggedInAccount) {
+      selectEl.value = currentLoggedInAccount;
+    }
+    document.getElementById("oldPassInput").value = "";
+    document.getElementById("newPassInput").value = "";
+    document.getElementById("confirmPassInput").value = "";
+    var modal = document.getElementById("passwordModal");
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  }
+
+  function closePasswordModal() {
+    var modal = document.getElementById("passwordModal");
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+
+  function saveNewPassword() {
+    ACCOUNTS = getAccountsStore();
+    var targetUser = document.getElementById("changePassTargetUser").value;
+    var oldPass = document.getElementById("oldPassInput").value.trim();
+    var newPass = document.getElementById("newPassInput").value.trim();
+    var confirmPass = document.getElementById("confirmPassInput").value.trim();
+
+    var acc = ACCOUNTS[targetUser];
+    if (!acc) return showToast("⚠️ Không tìm thấy tài khoản!");
+
+    // Nếu không phải admin đang reset thì bắt buộc kiểm tra mật khẩu cũ
+    if (currentLoggedInAccount !== "admin" && acc.pass !== oldPass) {
+      return showToast("⚠️ Mật khẩu hiện tại không chính xác!");
+    }
+    if (currentLoggedInAccount === "admin" && oldPass && acc.pass !== oldPass) {
+      return showToast("⚠️ Mật khẩu hiện tại không đúng!");
+    }
+    if (newPass.length < 4) {
+      return showToast("⚠️ Mật khẩu mới phải có ít nhất 4 ký tự!");
+    }
+    if (newPass !== confirmPass) {
+      return showToast("⚠️ Mật khẩu xác nhận không khớp!");
+    }
+
+    acc.pass = newPass;
+    saveAccountsStore(ACCOUNTS);
+    renderAccountManager();
+    closePasswordModal();
+    showToast("🔑 Đã đổi mật khẩu thành công cho tài khoản: " + targetUser);
+  }
+
+  function resetDefaultAccounts() {
+    saveAccountsStore(DEFAULT_ACCOUNTS);
+    ACCOUNTS = getAccountsStore();
+    renderAccountManager();
+    showToast("🔄 Đã khôi phục mật khẩu mặc định (admin/htb2025, kiemphiu/kp123)!");
+  }
+
+  function renderAccountManager() {
+    ACCOUNTS = getAccountsStore();
+    var container = document.getElementById("accountManagerList");
+    if (!container) return;
+    container.innerHTML = Object.keys(ACCOUNTS).map(function(key) {
+      var a = ACCOUNTS[key];
+      var badgeClass = a.role === "admin" ? "bg-indigo-100 text-indigo-800" : "bg-amber-100 text-amber-800";
+      return '<div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-between gap-2">' +
+        '<div><span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded ' + badgeClass + '">' + a.role.toUpperCase() + '</span>' +
+        '<div class="text-sm font-extrabold text-slate-900 mt-1">' + a.title + '</div>' +
+        '<div class="text-xs text-slate-600 mt-0.5">Tài khoản: <code class="font-mono font-bold">' + a.username + '</code> • Mật khẩu: <code class="font-mono font-bold text-sky-700">' + a.pass + '</code></div></div>' +
+        '<button type="button" onclick="openPasswordModal(\'' + a.username + '\')" class="px-3 py-2 rounded-xl bg-white border border-slate-200 hover:border-sky-400 text-sky-700 font-bold cursor-pointer shrink-0">🔑 Đổi MK</button>' +
+        '</div>';
+    }).join("");
+  }
+
   function quickSwitchRole(role, silent) {
-    const roleLabelMap = { delegate: "ĐẠI BIỂU CHÍNH THỨC", teller: "BAN KIỂM PHIẾU", admin: "ADMIN ĐIỀU HÀNH" };
+    var roleLabelMap = { delegate: "ĐẠI BIỂU CHÍNH THỨC", teller: "BAN KIỂM PHIẾU", admin: "ADMIN ĐIỀU HÀNH" };
     document.getElementById("currentRoleBadge").textContent = roleLabelMap[role];
     ["delegate", "teller", "admin"].forEach(function(r) {
-      const btn = document.getElementById("roleBtn-" + r);
+      var btn = document.getElementById("roleBtn-" + r);
       if (btn) {
         btn.className = (r === role)
           ? "py-1.5 rounded-lg bg-sky-500 text-white cursor-pointer"
           : "py-1.5 rounded-lg bg-white/10 text-slate-300 cursor-pointer";
       }
     });
-    const mgmtGroup = document.getElementById("menuGroup-management");
+    var mgmtGroup = document.getElementById("menuGroup-management");
     if (role === "delegate") {
       mgmtGroup.classList.add("hidden");
       switchTab("db-chuongtrinh");
@@ -886,18 +1196,18 @@
 
   function switchTab(tabId) {
     document.querySelectorAll(".tab-panel").forEach(function(el) { el.classList.add("hidden"); });
-    const panel = document.getElementById("tab-" + tabId);
+    var panel = document.getElementById("tab-" + tabId);
     if (panel) panel.classList.remove("hidden");
 
     document.querySelectorAll(".nav-item").forEach(function(btn) { btn.classList.remove("nav-active"); });
-    const navBtn = document.getElementById("nav-" + tabId);
+    var navBtn = document.getElementById("nav-" + tabId);
     if (navBtn) navBtn.classList.add("nav-active");
 
     document.querySelectorAll(".mnav-item").forEach(function(btn) {
       btn.classList.remove("text-sky-600", "font-bold");
       btn.classList.add("text-slate-500", "font-semibold");
     });
-    const mBtn = document.getElementById("mnav-" + tabId);
+    var mBtn = document.getElementById("mnav-" + tabId);
     if (mBtn) mBtn.classList.add("text-sky-600", "font-bold");
     closeMobileSidebar();
   }
@@ -906,10 +1216,11 @@
     currentConfKey = confKey;
     selectedCandidates.clear();
     hasSubmittedBallot = false;
-    const conf = CONFERENCES[confKey];
+    var conf = CONFERENCES[confKey];
     document.getElementById("headerConfBadge").textContent = conf.badge;
     document.getElementById("authConfSubtitle").textContent = conf.subtitle;
     document.getElementById("stageConfTitle").textContent = conf.subtitle;
+    document.getElementById("posterConfTitle").textContent = conf.subtitle.toUpperCase();
     document.getElementById("ballotTitle").textContent = conf.ballotTitle;
     document.getElementById("requiredVoteCount").textContent = conf.maxPick;
     document.getElementById("maxCandidateCount").textContent = conf.maxPick;
@@ -917,29 +1228,119 @@
     showToast("Đã chuyển sang: " + conf.badge);
   }
 
+  // ================= 4 MẪU SÂN KHẤU LED & 4 BỐ CỤC =================
+  function changeStageTheme(themeKey) {
+    var modal = document.getElementById("stageLedModal");
+    modal.classList.remove("stage-theme-youth", "stage-theme-crimson", "stage-theme-emerald", "stage-theme-royal");
+    modal.classList.add("stage-theme-" + themeKey);
+  }
+
+  function switchStageLayout(layoutKey) {
+    ["overview", "qr", "chart", "speaker"].forEach(function(k) {
+      var p = document.getElementById("stageLayoutPanel-" + k);
+      var b = document.getElementById("stLayout-" + k);
+      if (p) {
+        if (k === layoutKey) {
+          p.classList.remove("hidden");
+          if (k === "qr") p.classList.add("grid");
+        } else {
+          p.classList.add("hidden");
+          p.classList.remove("grid");
+        }
+      }
+      if (b) {
+        b.className = (k === layoutKey)
+          ? "px-3 py-1.5 rounded-lg bg-white text-slate-900 cursor-pointer"
+          : "px-3 py-1.5 rounded-lg text-white/80 hover:text-white cursor-pointer";
+      }
+    });
+    renderStageDynamicData();
+  }
+
+  function renderStageDynamicData() {
+    var presentList = DELEGATES.filter(function(d) { return d.present; });
+    document.getElementById("stageLivePresentBadge").textContent = "Có mặt: " + presentList.length + "/" + DELEGATES.length;
+    var recentBox = document.getElementById("stageRecentCheckinList");
+    if (recentBox) {
+      recentBox.innerHTML = presentList.map(function(d) {
+        return '<div class="p-3.5 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-between">' +
+          '<div><div class="text-sm font-extrabold">' + d.name + ' <span class="font-mono text-sky-300">(' + d.code + ')</span></div>' +
+          '<div class="text-xs opacity-80">' + d.group + '</div></div>' +
+          '<span class="px-3 py-1 rounded-xl bg-emerald-500/20 text-emerald-300 text-xs font-bold">✓ ' + d.time + '</span></div>';
+      }).join("");
+    }
+
+    var conf = CONFERENCES[currentConfKey];
+    var sorted = conf.candidates.slice().sort(function(a, b) { return b.votes - a.votes; });
+    var chartBox = document.getElementById("stageChartBarsContainer");
+    if (chartBox) {
+      chartBox.innerHTML = sorted.map(function(c, i) {
+        var pct = Math.min(100, Math.round((c.votes / 96) * 100));
+        return '<div class="space-y-1">' +
+          '<div class="flex justify-between text-sm font-bold"><span>#' + (i + 1) + '. ' + c.name + ' (' + c.unit + ')</span><span>' + c.votes + '/96 phiếu (' + pct + '%)</span></div>' +
+          '<div class="w-full h-4 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-sky-400 to-emerald-400 rounded-full" style="width:' + pct + '%"></div></div>' +
+          '</div>';
+      }).join("");
+    }
+  }
+
+  function openStageWithQr() {
+    toggleStageLed(true);
+    switchStageLayout("qr");
+  }
+
+  function toggleFullScreenStage() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(function() {});
+    } else {
+      document.exitFullscreen().catch(function() {});
+    }
+  }
+
+  function renderFixedQrPoster() {
+    var checkinUrl = getFixedCheckinUrl();
+    var qrApiUrl = "https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=10&data=" + encodeURIComponent(checkinUrl);
+    var posterImg = document.getElementById("fixedQrPosterImg");
+    var stageImg = document.getElementById("stageGiantQrImg");
+    if (posterImg) posterImg.src = qrApiUrl;
+    if (stageImg) stageImg.src = qrApiUrl;
+    var urlDisp = document.getElementById("fixedCheckinUrlDisplay");
+    var stageUrlDisp = document.getElementById("stageQrUrlText");
+    if (urlDisp) urlDisp.textContent = checkinUrl;
+    if (stageUrlDisp) stageUrlDisp.textContent = checkinUrl;
+  }
+
+  function copyFixedCheckinUrl() {
+    var url = getFixedCheckinUrl();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+    }
+    showToast("📋 Đã copy Link Điểm danh Cố định: " + url);
+  }
+
+  // ================= GOOGLE DRIVE FUNCTIONS =================
   function toggleDriveAddBox() {
     document.getElementById("driveAddBox").classList.toggle("hidden");
   }
 
   function addGoogleDriveDocument() {
-    const title = document.getElementById("newDriveTitle").value.trim();
-    const rawUrl = document.getElementById("newDriveUrl").value.trim();
-    const type = document.getElementById("newDriveType").value;
+    var title = document.getElementById("newDriveTitle").value.trim();
+    var rawUrl = document.getElementById("newDriveUrl").value.trim();
+    var type = document.getElementById("newDriveType").value;
     if (!title || !rawUrl) {
       showToast("⚠️ Vui lòng nhập Tên văn kiện và dán Link Google Drive!");
       return;
     }
-    const conf = CONFERENCES[currentConfKey];
-    const newId = "DRV-0" + (conf.documents.length + 1);
-    const newDoc = {
+    var conf = CONFERENCES[currentConfKey];
+    var newId = "DRV-0" + (conf.documents.length + 1);
+    conf.documents.unshift({
       id: newId,
       type: type,
       title: title,
       driveUrl: rawUrl,
       summary: "Văn kiện được liên kết trực tiếp từ Google Drive.",
       body: "Tài liệu đang được nhúng trực tiếp từ Google Drive: <code>" + rawUrl + "</code>"
-    };
-    conf.documents.unshift(newDoc);
+    });
     document.getElementById("newDriveTitle").value = "";
     document.getElementById("newDriveUrl").value = "";
     document.getElementById("driveAddBox").classList.add("hidden");
@@ -949,9 +1350,9 @@
   }
 
   function syncFromGoogleDriveFolder() {
-    const folderId = localStorage.getItem(STORAGE_PREFIX + "DRIVE_FOLDER_ID") || window.HTB_CONFIG.GOOGLE_DRIVE_FOLDER_ID;
-    const conf = CONFERENCES[currentConfKey];
-    const folderDocId = "FOLDER-DRIVE";
+    var folderId = localStorage.getItem(STORAGE_PREFIX + "DRIVE_FOLDER_ID") || window.HTB_CONFIG.GOOGLE_DRIVE_FOLDER_ID;
+    var conf = CONFERENCES[currentConfKey];
+    var folderDocId = "FOLDER-DRIVE";
     if (!conf.documents.some(function(d) { return d.id === folderDocId; })) {
       conf.documents.unshift({
         id: folderDocId,
@@ -968,7 +1369,7 @@
   }
 
   function switchReaderMode(mode) {
-    const isDrive = mode === "drive";
+    var isDrive = mode === "drive";
     document.getElementById("driveIframeWrapper").classList.toggle("hidden", !isDrive);
     document.getElementById("driveTextFallback").classList.toggle("hidden", isDrive);
     document.getElementById("modeBtn-drive").className = isDrive
@@ -980,15 +1381,15 @@
   }
 
   function renderDocuments() {
-    const conf = CONFERENCES[currentConfKey];
+    var conf = CONFERENCES[currentConfKey];
     document.getElementById("docCountBadge").textContent = conf.documents.length + " file";
-    const q = (document.getElementById("docSearchInput")?.value || "").toLowerCase();
-    const list = conf.documents.filter(function(d) {
+    var q = (document.getElementById("docSearchInput")?.value || "").toLowerCase();
+    var list = conf.documents.filter(function(d) {
       return d.title.toLowerCase().includes(q) || d.summary.toLowerCase().includes(q);
     });
-    const container = document.getElementById("documentListContainer");
+    var container = document.getElementById("documentListContainer");
     container.innerHTML = list.map(function(doc) {
-      const isSelected = doc.id === currentDocId;
+      var isSelected = doc.id === currentDocId;
       return '<div onclick="openDocument(\'' + doc.id + '\')" class="cursor-pointer p-4 rounded-2xl border-2 transition space-y-1.5 ' +
         (isSelected ? 'border-sky-600 bg-sky-50/60 shadow-xs' : 'border-slate-200 hover:border-sky-400 bg-white') + '">' +
         '<div class="flex items-center justify-between">' +
@@ -1006,20 +1407,19 @@
 
   function openDocument(docId) {
     currentDocId = docId;
-    const conf = CONFERENCES[currentConfKey];
-    const doc = conf.documents.find(function(d) { return d.id === docId; }) || conf.documents[0];
+    var conf = CONFERENCES[currentConfKey];
+    var doc = conf.documents.find(function(d) { return d.id === docId; }) || conf.documents[0];
     if (!doc) return;
-    const embedUrl = toGoogleDriveEmbedUrl(doc.driveUrl);
+    var embedUrl = toGoogleDriveEmbedUrl(doc.driveUrl);
     document.getElementById("readerDocBadge").textContent = doc.id + " • " + (doc.type || "DRIVE");
     document.getElementById("readerDocTitle").textContent = doc.title;
     document.getElementById("readerDocContent").innerHTML = doc.body || doc.summary;
     document.getElementById("drivePreviewIframe").src = embedUrl;
     document.getElementById("driveDirectOpenLink").href = doc.driveUrl;
-    document.getElementById("driveEmbedUrlDisplay").textContent = embedUrl;
   }
 
   function renderAgenda() {
-    const conf = CONFERENCES[currentConfKey];
+    var conf = CONFERENCES[currentConfKey];
     document.getElementById("agendaListContainer").innerHTML = conf.agenda.map(function(item) {
       return '<div class="p-4 rounded-2xl border ' + (item.status === 'live' ? 'border-sky-400 bg-sky-50/50' : 'border-slate-200 bg-white') + ' flex flex-col sm:flex-row sm:items-center justify-between gap-2">' +
         '<div><span class="text-xs font-extrabold text-sky-700 font-mono">' + item.time + '</span>' +
@@ -1036,20 +1436,22 @@
   }
 
   function registerSpeech() {
-    const topic = document.getElementById("speechTopicInput").value.trim();
+    var topic = document.getElementById("speechTopicInput").value.trim();
     if (!topic) return showToast("⚠️ Vui lòng nhập chủ đề phát biểu!");
-    const name = document.getElementById("currentUserName").textContent;
+    var name = document.getElementById("currentUserName").textContent;
     SPEECHES.push({ speaker: name, topic: topic, status: "Chờ Đoàn Chủ tịch mời" });
+    document.getElementById("stageSpeakerName").textContent = "Đồng chí: " + name;
+    document.getElementById("stageSpeakerTopic").textContent = "Chủ đề: " + topic;
     document.getElementById("speechTopicInput").value = "";
     renderAgenda();
     showToast("🎙️ Đã gửi đăng ký phát biểu lên Đoàn Chủ tịch!");
   }
 
   function renderCandidates() {
-    const conf = CONFERENCES[currentConfKey];
+    var conf = CONFERENCES[currentConfKey];
     document.getElementById("selectedCandidateCount").textContent = selectedCandidates.size;
     document.getElementById("candidateListContainer").innerHTML = conf.candidates.map(function(c) {
-      const checked = selectedCandidates.has(c.id);
+      var checked = selectedCandidates.has(c.id);
       return '<div onclick="toggleCandidate(\'' + c.id + '\')" class="cursor-pointer p-4 rounded-2xl border-2 transition flex items-center justify-between gap-3 ' +
         (checked ? 'border-sky-600 bg-sky-50/70' : 'border-slate-200 bg-white') + '">' +
         '<div><div class="text-[11px] font-bold text-sky-700">' + c.id + ' • ' + c.unit + '</div>' +
@@ -1062,7 +1464,7 @@
 
   function toggleCandidate(id) {
     if (hasSubmittedBallot) return showToast("Bạn đã bỏ phiếu rồi!");
-    const maxPick = CONFERENCES[currentConfKey].maxPick;
+    var maxPick = CONFERENCES[currentConfKey].maxPick;
     if (selectedCandidates.has(id)) selectedCandidates.delete(id);
     else {
       if (selectedCandidates.size >= maxPick) return showToast("⚠️ Quy chế chỉ cho phép chọn đúng " + maxPick + " ứng viên!");
@@ -1074,13 +1476,13 @@
   function selectAllValidCandidates() {
     if (hasSubmittedBallot) return;
     selectedCandidates.clear();
-    const conf = CONFERENCES[currentConfKey];
+    var conf = CONFERENCES[currentConfKey];
     conf.candidates.slice(0, conf.maxPick).forEach(function(c) { selectedCandidates.add(c.id); });
     renderCandidates();
   }
 
   function submitDelegateBallot() {
-    const conf = CONFERENCES[currentConfKey];
+    var conf = CONFERENCES[currentConfKey];
     if (selectedCandidates.size !== conf.maxPick) return showToast("⚠️ Vui lòng chọn đúng " + conf.maxPick + " ứng viên!");
     hasSubmittedBallot = true;
     conf.candidates.forEach(function(c) { if (selectedCandidates.has(c.id)) c.votes += 1; });
@@ -1088,14 +1490,15 @@
     document.getElementById("badgeVotedStatus").textContent = "Đã bầu";
     document.getElementById("badgeVotedStatus").className = "ml-auto text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300";
     renderTellerResults();
+    renderStageDynamicData();
     showToast("🎉 Đã gửi phiếu bầu hợp lệ!");
   }
 
   function renderMotions() {
-    const conf = CONFERENCES[currentConfKey];
+    var conf = CONFERENCES[currentConfKey];
     document.getElementById("motionsListContainer").innerHTML = conf.motions.map(function(m) {
-      const total = m.agree + m.disagree + m.abstain || 1;
-      const pct = Math.round((m.agree / total) * 100);
+      var total = m.agree + m.disagree + m.abstain || 1;
+      var pct = Math.round((m.agree / total) * 100);
       return '<div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-3">' +
         '<div class="flex items-start justify-between gap-2">' +
         '<h4 class="text-sm font-extrabold text-slate-900">' + m.title + '</h4>' +
@@ -1109,7 +1512,7 @@
   }
 
   function castMotionVote(id, choice) {
-    const m = CONFERENCES[currentConfKey].motions.find(function(x) { return x.id === id; });
+    var m = CONFERENCES[currentConfKey].motions.find(function(x) { return x.id === id; });
     if (!m) return;
     m[choice] += 1;
     renderMotions();
@@ -1117,8 +1520,8 @@
   }
 
   function renderTellerResults() {
-    const conf = CONFERENCES[currentConfKey];
-    const sorted = conf.candidates.slice().sort(function(a, b) { return b.votes - a.votes; });
+    var conf = CONFERENCES[currentConfKey];
+    var sorted = conf.candidates.slice().sort(function(a, b) { return b.votes - a.votes; });
     document.getElementById("tellerResultsContainer").innerHTML = sorted.map(function(c, i) {
       return '<div class="p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between text-xs">' +
         '<span class="font-extrabold">#' + (i + 1) + '. ' + c.name + ' (' + c.unit + ')</span>' +
@@ -1127,16 +1530,16 @@
   }
 
   function exportWordMinutes() {
-    const conf = CONFERENCES[currentConfKey];
-    const sorted = conf.candidates.slice().sort(function(a, b) { return b.votes - a.votes; });
-    const rows = sorted.map(function(c, i) {
+    var conf = CONFERENCES[currentConfKey];
+    var sorted = conf.candidates.slice().sort(function(a, b) { return b.votes - a.votes; });
+    var rows = sorted.map(function(c, i) {
       return "<p>" + (i + 1) + ". Đồng chí <strong>" + c.name + "</strong> (" + c.unit + "): <strong>" + c.votes + "/96</strong> phiếu</p>";
     }).join("");
-    const html = '<html><head><meta charset="utf-8"></head><body style="font-family:Times New Roman;font-size:14pt">' +
+    var html = '<html><head><meta charset="utf-8"></head><body style="font-family:Times New Roman;font-size:14pt">' +
       '<h2 style="text-align:center">TRƯỜNG THPT HỒ THỊ BI<br>' + conf.subtitle.toUpperCase() + '</h2>' +
       '<h3 style="text-align:center">BIÊN BẢN KIỂM PHIẾU BẦU CỬ ĐIỆN TỬ</h3>' + rows + '</body></html>';
-    const blob = new Blob([html], { type: "application/msword" });
-    const a = document.createElement("a");
+    var blob = new Blob([html], { type: "application/msword" });
+    var a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "Bien_Ban_Kiem_Phieu_" + currentConfKey + ".doc";
     a.click();
@@ -1144,14 +1547,14 @@
   }
 
   function exportCsvResults() {
-    const conf = CONFERENCES[currentConfKey];
-    const lines = ["STT,Ma_UCV,Ho_Ten,Don_Vi,So_Phieu"];
+    var conf = CONFERENCES[currentConfKey];
+    var lines = ["STT,Ma_UCV,Ho_Ten,Don_Vi,So_Phieu"];
     conf.candidates.forEach(function(c, idx) {
       lines.push((idx + 1) + "," + c.id + ",\"" + c.name + "\",\"" + c.unit + "\"," + c.votes);
     });
-    const csvContent = "\uFEFF" + lines.join(String.fromCharCode(10));
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const a = document.createElement("a");
+    var csvContent = "\uFEFF" + lines.join(String.fromCharCode(10));
+    var blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    var a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "Ket_Qua_Kiem_Phieu_" + currentConfKey + ".csv";
     a.click();
@@ -1159,23 +1562,24 @@
   }
 
   function renderRosterTable() {
-    const q = (document.getElementById("rosterSearch")?.value || "").toLowerCase();
-    const filtered = DELEGATES.filter(function(d) {
+    var q = (document.getElementById("rosterSearch")?.value || "").toLowerCase();
+    var filtered = DELEGATES.filter(function(d) {
       return d.name.toLowerCase().includes(q) || d.code.toLowerCase().includes(q);
     });
     document.getElementById("rosterListContainer").innerHTML = filtered.map(function(d) {
       return '<div class="p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between text-xs bg-slate-50/40">' +
         '<div><span class="font-extrabold text-slate-900">' + d.code + ' • ' + d.name + '</span>' +
-        '<span class="text-slate-500 ml-2">(' + d.group + ') • Giờ quét: ' + d.time + '</span></div>' +
+        '<span class="text-slate-500 ml-2">(' + d.group + ') • Giờ điểm danh: ' + d.time + '</span></div>' +
         '<button type="button" onclick="toggleDelegatePresent(\'' + d.code + '\')" class="px-3 py-1.5 rounded-xl font-bold cursor-pointer ' +
         (d.present ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-700') + '">' +
         (d.present ? '✓ Có mặt' : 'Vắng mặt') + '</button></div>';
     }).join("");
-    renderQrCards();
+    renderCheckinCandidateList();
+    renderStageDynamicData();
   }
 
   function toggleDelegatePresent(code) {
-    const d = DELEGATES.find(function(x) { return x.code === code; });
+    var d = DELEGATES.find(function(x) { return x.code === code; });
     if (!d) return;
     d.present = !d.present;
     d.time = d.present ? new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) : "--:--";
@@ -1183,12 +1587,12 @@
   }
 
   function importBulkDelegates() {
-    const raw = document.getElementById("bulkDelegateInput").value.trim();
+    var raw = document.getElementById("bulkDelegateInput").value.trim();
     if (!raw) return showToast("⚠️ Hãy dán dữ liệu đại biểu vào ô!");
-    const lines = raw.split(String.fromCharCode(10));
-    let count = 0;
+    var lines = raw.split(String.fromCharCode(10));
+    var count = 0;
     lines.forEach(function(line) {
-      const parts = line.split(/[|;,\t]/).map(function(s) { return s.trim(); }).filter(Boolean);
+      var parts = line.split(/[|;,\t]/).map(function(s) { return s.trim(); }).filter(Boolean);
       if (parts.length >= 2) {
         DELEGATES.push({
           code: parts[0].toUpperCase(),
@@ -1203,20 +1607,6 @@
     document.getElementById("bulkDelegateInput").value = "";
     renderRosterTable();
     showToast("✅ Đã nạp thêm " + count + " đại biểu!");
-  }
-
-  function renderQrCards() {
-    const baseUrl = window.location.origin + window.location.pathname;
-    document.getElementById("qrCardsContainer").innerHTML = DELEGATES.map(function(d) {
-      const autoUrl = baseUrl + "?qr=" + encodeURIComponent(d.code);
-      return '<div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-1.5">' +
-        '<div class="flex items-center justify-between">' +
-        '<span class="text-[11px] font-mono font-extrabold px-2 py-0.5 rounded bg-sky-100 text-sky-800">' + d.code + '</span>' +
-        '<span class="text-[10px] font-bold text-slate-500">THPT HỒ THỊ BI</span></div>' +
-        '<div class="text-sm font-extrabold text-slate-900">' + d.name + '</div>' +
-        '<div class="text-xs text-slate-500">' + d.group + '</div>' +
-        '<div class="text-[10px] font-mono text-sky-700 break-all bg-white p-2 rounded-lg border border-slate-200">' + autoUrl + '</div></div>';
-    }).join("");
   }
 
   function renderDuplicates() {
@@ -1236,8 +1626,9 @@
   }
 
   function toggleStageLed(show) {
-    const modal = document.getElementById("stageLedModal");
+    var modal = document.getElementById("stageLedModal");
     if (show) {
+      renderStageDynamicData();
       modal.classList.remove("hidden");
       modal.classList.add("flex");
       closeMobileSidebar();
@@ -1249,11 +1640,14 @@
 
   function startSpeechTimer(seconds) {
     clearInterval(speechTimerInterval);
-    let rem = seconds;
-    const render = function() {
-      const m = String(Math.floor(rem / 60)).padStart(2, "0");
-      const s = String(rem % 60).padStart(2, "0");
-      document.getElementById("stageTimerDisplay").textContent = m + ":" + s;
+    var rem = seconds;
+    var render = function() {
+      var m = String(Math.floor(rem / 60)).padStart(2, "0");
+      var s = String(rem % 60).padStart(2, "0");
+      var text = m + ":" + s;
+      document.getElementById("stageTimerDisplay").textContent = text;
+      var big2 = document.getElementById("stageBigTimer2");
+      if (big2) big2.textContent = text;
     };
     render();
     speechTimerInterval = setInterval(function() {
@@ -1266,27 +1660,11 @@
   }
 
   function saveCloudConfig() {
-    const wUrl = document.getElementById("cfgWorkerUrl").value.trim();
-    const gUrl = document.getElementById("cfgGasUrl").value.trim();
-    const fId = document.getElementById("cfgDriveFolderId").value.trim();
+    var wUrl = document.getElementById("cfgWorkerUrl").value.trim();
+    var fId = document.getElementById("cfgDriveFolderId").value.trim();
     localStorage.setItem(STORAGE_PREFIX + "WORKER_URL", wUrl);
-    localStorage.setItem(STORAGE_PREFIX + "GAS_URL", gUrl);
     localStorage.setItem(STORAGE_PREFIX + "DRIVE_FOLDER_ID", fId);
-    showToast("💾 Đã lưu cấu hình Cloud độc lập V5.1!");
-  }
-
-  function exportFullBackupJson() {
-    const payload = {
-      version: "5.1.0-INDEPENDENT",
-      exportedAt: new Date().toISOString(),
-      conferences: CONFERENCES,
-      delegates: DELEGATES
-    };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "HTB_DA_HOI_NGHI_V5_BACKUP.json";
-    a.click();
+    showToast("💾 Đã lưu cấu hình Cloud V5.2!");
   }
 
   function renderAll() {
@@ -1297,14 +1675,17 @@
     renderTellerResults();
     renderRosterTable();
     renderDuplicates();
+    renderFixedQrPoster();
+    renderAccountManager();
   }
 
   window.addEventListener("DOMContentLoaded", function() {
     renderAll();
-    const params = new URLSearchParams(window.location.search);
-    const qrCodeParam = params.get("qr");
-    if (qrCodeParam) {
-      quickQRLogin(qrCodeParam);
+    // Khi đại biểu quét Mã QR Cố định (?checkin=1), mở ngay Cổng Điểm Danh Đại Biểu
+    var params = new URLSearchParams(window.location.search);
+    if (params.get("checkin")) {
+      switchAuthTab("delegate");
+      openAuthModal();
     }
   });
 </script>
