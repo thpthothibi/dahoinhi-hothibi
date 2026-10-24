@@ -5,7 +5,7 @@ window.HTB_CONFIG = {
   SCHOOL_NAME: "TRƯỜNG THPT HỒ THỊ BI",
   DEFAULT_CONFERENCE: "doan",
   // Điền URL Cloudflare Worker mới của bạn vào đây sau khi tạo Worker độc lập:
-  WORKER_API_URL: "",
+  WORKER_API_URL: "https://htb-hoinghi-v5-api.thpthothibi2.workers.dev/",
   // Điền URL Google Apps Script (nếu muốn tự động quét toàn bộ file trong 1 thư mục Google Drive):
   GOOGLE_DRIVE_GAS_URL: "",
   // ID Thư mục Google Drive mặc định chứa văn kiện:
