@@ -1,0 +1,8 @@
+name = "htb-hoinghi-v5-api"
+main = "WORKER_DAN_TRUC_TIEP.mjs"
+compatibility_date = "2025-02-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "htb_hoinghi_v5_db"
+database_id = "THAY_BANG_DATABASE_ID_MOI_CUA_BAN"

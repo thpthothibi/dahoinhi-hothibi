@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>HTB Đa Hội Nghị V5.0 - Bản Độc Lập (GitHub • Cloudflare • Google Drive)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="./config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    .sidebar-gradient { background: linear-gradient(180deg, #06102A 0%, #0B1D48 52%, #0E2963 100%); }
+    .nav-active {
+      background: linear-gradient(90deg, #0284C7 0%, #2563EB 100%);
+      box-shadow: 0 8px 20px -4px rgba(2, 132, 199, 0.58);
+      color: #ffffff !important;
+      border-left: 4px solid #38BDF8;
+    }
+    .glass-header { background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(12px); }
+    .scan-line {
+      position: absolute; left: 8%; right: 8%; height: 3px;
+      background: linear-gradient(90deg, transparent, #38BDF8, #10B981, #38BDF8, transparent);
+      box-shadow: 0 0 12px #38BDF8;
+      animation: scanMove 2.2s ease-in-out infinite;
+    }
+    @keyframes scanMove {
+      0%, 100% { top: 10%; }
+      50% { top: 88%; }
+    }
+    @media print {
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased selection:bg-sky-600 selection:text-white">
+
+<!-- ================= CỔNG ĐĂNG NHẬP & QUÉT QR 1 CHẠM ================= -->
+<div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-md p-3 sm:p-4 overflow-y-auto no-print">
+  <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-auto">
+    <div class="sidebar-gradient p-5 sm:p-6 text-white text-center relative">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-[11px] font-bold mb-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        HTB ĐA HỘI NGHỊ V5.0 • BẢN ĐỘC LẬP MỚI
+      </div>
+      <h1 class="text-lg sm:text-xl font-black tracking-tight">TRƯỜNG THPT HỒ THỊ BI</h1>
+      <p id="authConfSubtitle" class="text-xs text-sky-200/90 mt-1">Đại hội Đại biểu Đoàn TNCS Hồ Chí Minh nhiệm kỳ 2026 - 2027</p>
+    </div>
+
+    <!-- Chuyển 3 phân quyền -->
+    <div class="grid grid-cols-3 bg-slate-100 p-1.5 m-4 rounded-2xl text-xs font-bold">
+      <button onclick="switchAuthTab('delegate')" id="authTab-delegate" class="py-2.5 rounded-xl bg-white text-sky-700 shadow-sm transition">📱 Đại biểu (QR)</button>
+      <button onclick="switchAuthTab('teller')" id="authTab-teller" class="py-2.5 rounded-xl text-slate-600 transition">🗳️ Kiểm phiếu</button>
+      <button onclick="switchAuthTab('admin')" id="authTab-admin" class="py-2.5 rounded-xl text-slate-600 transition">⚙️ Admin</button>
+    </div>
+
+    <!-- TAB 1: ĐẠI BIỂU QUÉT QR VÀO THẲNG CHƯƠNG TRÌNH -->
+    <div id="authPanel-delegate" class="px-5 pb-6 space-y-3.5">
+      <div class="relative bg-slate-900 rounded-2xl h-44 flex flex-col items-center justify-center text-white overflow-hidden border-2 border-sky-500/40">
+        <video id="qrVideoPreview" class="absolute inset-0 w-full h-full object-cover hidden" playsinline></video>
+        <div class="scan-line"></div>
+        <div class="relative z-10 w-24 h-24 border-2 border-dashed border-sky-400/80 rounded-2xl flex items-center justify-center bg-slate-950/40">
+          <span class="text-3xl">📷</span>
+        </div>
+        <p id="qrCameraStatus" class="relative z-10 text-xs text-sky-200 mt-2 font-medium px-4 text-center">Quét mã QR trên thẻ đại biểu để điểm danh & vào thẳng Chương trình</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="startRealCameraScan()" class="py-3 px-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-1.5">
+          <span>🎥 Bật Camera Quét</span>
+        </button>
+        <button onclick="quickQRLogin('HTB-001')" class="py-3 px-3 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold text-xs shadow-lg shadow-sky-600/30 flex items-center justify-center gap-1.5">
+          <span>⚡ Quét Nhanh (Demo)</span>
+        </button>
+      </div>
+
+      <div class="pt-2 border-t border-slate-100 space-y-2">
+        <label class="block text-xs font-bold text-slate-600">Hoặc chọn/nhập mã thẻ Đại biểu (HTB-001 → HTB-100):</label>
+        <div class="flex gap-2">
+          <select id="qrDelegateSelect" class="flex-1 rounded-xl border border-slate-200 px-3 py-2.5 text-xs font-semibold bg-slate-50">
+            <option value="HTB-001">HTB-001 • Nguyễn Minh Anh (Chi đoàn 12A1)</option>
+            <option value="HTB-002">HTB-002 • Trần Quốc Bảo (Chi đoàn 12A2)</option>
+            <option value="HTB-003">HTB-003 • Lê Hoàng Châu (Chi đoàn Giáo viên)</option>
+            <option value="HTB-004">HTB-004 • Phạm Tuấn Kiệt (Chi đoàn 11A1)</option>
+            <option value="HTB-005">HTB-005 • Võ Ngọc Phương Nghi (Chi đoàn 10A3)</option>
+          </select>
+          <button onclick="quickQRLogin(document.getElementById('qrDelegateSelect').value)" class="px-4 py-2.5 bg-sky-600 text-white text-xs font-extrabold rounded-xl hover:bg-sky-500 shrink-0">Vào ngay</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: TÀI KHOẢN BAN KIỂM PHIẾU -->
+    <div id="authPanel-teller" class="px-5 pb-6 space-y-3 hidden">
+      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3 text-xs text-amber-900">
+        <p class="font-bold">Tài khoản Ban Kiểm Phiếu:</p>
+        <p class="mt-0.5">• Trưởng ban: <code class="font-mono font-bold">kiemphiu</code> / Mật khẩu: <code class="font-mono font-bold">kp123</code></p>
+        <p>• Thư ký KP: <code class="font-mono font-bold">thukykp</code> / Mật khẩu: <code class="font-mono font-bold">kp123</code></p>
+      </div>
+      <input id="tellerUser" type="text" value="kiemphiu" placeholder="Tên đăng nhập" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold" />
+      <input id="tellerPass" type="password" value="kp123" placeholder="Mật khẩu" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold" />
+      <button onclick="loginWithAccount('teller')" class="w-full py-3 rounded-2xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-sm shadow-lg shadow-amber-600/25">
+        🗳️ Đăng nhập Ban Kiểm Phiếu
+      </button>
+    </div>
+
+    <!-- TAB 3: TÀI KHOẢN ADMIN / ĐOÀN CHỦ TỊCH -->
+    <div id="authPanel-admin" class="px-5 pb-6 space-y-3 hidden">
+      <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-3 text-xs text-indigo-900">
+        <p class="font-bold">Tài khoản Đoàn Chủ tịch / Admin:</p>
+        <p class="mt-0.5">• Quản trị: <code class="font-mono font-bold">admin</code> / Mật khẩu: <code class="font-mono font-bold">htb2025</code></p>
+        <p>• Chủ tọa: <code class="font-mono font-bold">chutoa</code> / Mật khẩu: <code class="font-mono font-bold">htb2025</code></p>
+      </div>
+      <input id="adminUser" type="text" value="admin" placeholder="Tài khoản Admin" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold" />
+      <input id="adminPass" type="password" value="htb2025" placeholder="Mật khẩu" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold" />
+      <button onclick="loginWithAccount('admin')" class="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/25">
+        ⚙️ Đăng nhập Admin Điều Hành
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- LỚP PHỦ MỜ KHI MỞ MENU TRÁI TRÊN DI ĐỘNG -->
+<div id="sidebarBackdrop" onclick="closeMobileSidebar()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-30 hidden lg:hidden no-print"></div>
+
+<!-- ================= MÀN HÌNH TRÌNH CHIẾU SÂN KHẤU LED (FULLSCREEN) ================= -->
+<div id="stageLedModal" class="fixed inset-0 z-50 bg-slate-950 text-white hidden flex-col justify-between p-6 sm:p-10">
+  <div class="flex items-center justify-between border-b border-white/10 pb-4">
+    <div class="flex items-center gap-4">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center font-black text-2xl shadow-lg">HTB</div>
+      <div>
+        <div class="text-xs font-bold text-sky-400 tracking-widest uppercase">TRƯỜNG THPT HỒ THỊ BI • MÀN HÌNH ĐẠI HỘI LED</div>
+        <h2 id="stageConfTitle" class="text-xl sm:text-3xl font-black mt-0.5">Đại hội Đại biểu Đoàn TNCS Hồ Chí Minh nhiệm kỳ 2026 - 2027</h2>
+      </div>
+    </div>
+    <button onclick="toggleStageLed(false)" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold">✕ Thoát trình chiếu</button>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 my-auto py-6">
+    <div class="bg-white/5 border border-white/10 rounded-3xl p-6 text-center space-y-2">
+      <div class="text-xs font-bold uppercase text-sky-300">Tỷ lệ Đại biểu Có mặt</div>
+      <div id="stageQuorumPct" class="text-5xl sm:text-6xl font-black text-emerald-400">96%</div>
+      <div id="stageQuorumSub" class="text-sm text-slate-300">96 / 100 đại biểu chính thức (Đủ điều kiện khai mạc)</div>
+    </div>
+    <div class="bg-white/5 border border-white/10 rounded-3xl p-6 text-center space-y-2">
+      <div class="text-xs font-bold uppercase text-amber-300">Tiến độ Bỏ phiếu Điện tử</div>
+      <div id="stageBallotCount" class="text-5xl sm:text-6xl font-black text-sky-400">92/96</div>
+      <div class="text-sm text-slate-300">100% phiếu hợp lệ • Mã hóa SHA-256</div>
+    </div>
+    <div class="bg-white/5 border border-white/10 rounded-3xl p-6 text-center space-y-2">
+      <div class="text-xs font-bold uppercase text-rose-300">Đồng hồ Tham luận</div>
+      <div id="stageTimerDisplay" class="text-5xl sm:text-6xl font-black font-mono text-white">05:00</div>
+      <div class="flex justify-center gap-2 pt-2">
+        <button onclick="startSpeechTimer(300)" class="px-3 py-1 rounded-lg bg-sky-600 text-xs font-bold">5 phút</button>
+        <button onclick="startSpeechTimer(180)" class="px-3 py-1 rounded-lg bg-emerald-600 text-xs font-bold">3 phút</button>
+        <button onclick="stopSpeechTimer()" class="px-3 py-1 rounded-lg bg-rose-600 text-xs font-bold">Dừng</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center text-xs text-slate-400 border-t border-white/10 pt-4">
+    Hệ thống Điều hành Đa Hội Nghị V5.0 • Đồng bộ Thời gian thực qua Cloudflare D1 & Google Drive
+  </div>
+</div>
+
+<!-- ================= BỐ CỤC CHÍNH (SIDEBAR TRÁI + NỘI DUNG PHẢI) ================= -->
+<div class="min-h-screen flex">
+
+  <!-- THANH MENU BÊN TRÁI (ẨN HOÀN TOÀN TRÊN DI ĐỘNG, MỞ BẰNG NÚT ☰) -->
+  <aside id="leftSidebar" class="sidebar-gradient text-slate-100 w-72 fixed inset-y-0 left-0 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col justify-between shadow-2xl border-r border-sky-400/15 no-print">
+    <div>
+      <!-- Logo -->
+      <div class="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center font-black text-white shadow-md">HTB</div>
+          <div>
+            <div class="text-[11px] font-bold text-sky-300 tracking-wider">THPT HỒ THỊ BI</div>
+            <div class="text-sm font-extrabold text-white">ĐA HỘI NGHỊ V5.0</div>
+          </div>
+        </div>
+        <button onclick="closeMobileSidebar()" class="lg:hidden p-2 rounded-xl bg-white/10 text-white hover:bg-white/20">✕</button>
+      </div>
+
+      <!-- Chuyển loại Hội nghị -->
+      <div class="px-4 py-3 border-b border-white/10">
+        <label class="text-[10px] uppercase tracking-wider font-bold text-sky-300/80 block mb-1">Chuyển loại Hội nghị</label>
+        <select id="conferenceSelect" onchange="changeConference(this.value)" class="w-full bg-slate-900/80 border border-sky-400/30 text-white text-xs font-semibold rounded-xl px-3 py-2">
+          <option value="doan">1. Đại hội Đoàn TNCS Hồ Chí Minh</option>
+          <option value="vienchuc">2. Hội nghị Viên chức - Người lao động</option>
+          <option value="hdsp">3. Họp Hội đồng Sư phạm định kỳ</option>
+          <option value="cmhs">4. Hội nghị Đại biểu Cha mẹ học sinh</option>
+        </select>
+      </div>
+
+      <!-- Thông tin tài khoản đang đăng nhập -->
+      <div class="mx-4 mt-3 p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
+        <div class="truncate pr-2">
+          <div id="currentRoleBadge" class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-300">ĐẠI BIỂU CHÍNH THỨC</div>
+          <div id="currentUserName" class="text-xs font-bold text-white truncate">Nguyễn Minh Anh (HTB-001)</div>
+        </div>
+        <button onclick="openAuthModal()" class="px-2.5 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 text-[11px] font-bold shrink-0 border border-sky-400/30">Đổi TK</button>
+      </div>
+
+      <!-- Danh sách Menu Trái -->
+      <div class="px-3 py-3 space-y-4 overflow-y-auto max-h-[calc(100vh-290px)]">
+        <!-- NHÓM 1: ĐẠI BIỂU -->
+        <div>
+          <div class="px-3 mb-1.5 text-[10px] font-extrabold uppercase tracking-widest text-sky-300/75">Phân hệ Đại biểu</div>
+          <nav class="space-y-1">
+            <button onclick="switchTab('db-chuongtrinh')" id="nav-db-chuongtrinh" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition">
+              <span>📅</span><span>Chương trình Đại hội</span>
+              <span class="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300">Live</span>
+            </button>
+            <button onclick="switchTab('db-vankien')" id="nav-db-vankien" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition">
+              <span>☁️</span><span>Văn kiện (Google Drive)</span>
+              <span id="docCountBadge" class="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-sky-500/30 text-sky-200">3 file</span>
+            </button>
+            <button onclick="switchTab('db-baucu')" id="nav-db-baucu" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition">
+              <span>🗳️</span><span>Bầu cử Ban Chấp hành</span>
+              <span id="badgeVotedStatus" class="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300">Chưa bầu</span>
+            </button>
+            <button onclick="switchTab('db-bieuquyet')" id="nav-db-bieuquyet" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition">
+              <span>✋</span><span>Biểu quyết Chỉ tiêu</span>
+            </button>
+          </nav>
+        </div>
+
+        <!-- NHÓM 2: BAN KIỂM PHIẾU & ADMIN ĐIỀU HÀNH -->
+        <div id="menuGroup-management" class="hidden">
+          <div class="px-3 mb-1.5 text-[10px] font-extrabold uppercase tracking-widest text-amber-300/80">Ban Kiểm Phiếu & Admin</div>
+          <nav class="space-y-1">
+            <button onclick="switchTab('kp-kiemphiu')" id="nav-kp-kiemphiu" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition">
+              <span>📊</span><span>Giám sát & Kiểm phiếu</span>
+            </button>
+            <button onclick="switchTab('ad-diemdan')" id="nav-ad-diemdan" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition">
+              <span>⚡</span><span>Điều hành & Điểm danh</span>
+            </button>
+            <button onclick="switchTab('ad-trunglap')" id="nav-ad-trunglap" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition">
+              <span>🛡️</span><span>Kiểm tra Trùng lặp</span>
+              <span id="dupCountBadge" class="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-rose-500 text-white font-bold">2</span>
+            </button>
+            <button onclick="switchTab('ad-theqr')" id="nav-ad-theqr" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition">
+              <span>🖨️</span><span>Phôi Thẻ QR & Link Quét</span>
+            </button>
+            <button onclick="switchTab('ad-cloud')" id="nav-ad-cloud" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition">
+              <span>🔗</span><span>Kết nối Cloud & Drive</span>
+            </button>
+            <button onclick="toggleStageLed(true)" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-400/20 transition">
+              <span>🖥️</span><span>Màn hình Sân khấu LED</span>
+            </button>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- Thanh chuyển nhanh vai trò để kiểm thử -->
+    <div class="p-3.5 border-t border-white/10 bg-slate-950/40 space-y-2">
+      <div class="flex items-center justify-between text-[10px] text-sky-200/80">
+        <span>Chuyển nhanh góc nhìn:</span>
+        <span id="cloudStatusDot" class="font-bold text-emerald-400">● Độc lập V5</span>
+      </div>
+      <div class="grid grid-cols-3 gap-1.5 text-[11px] font-bold">
+        <button onclick="quickSwitchRole('delegate')" id="roleBtn-delegate" class="py-1.5 rounded-lg bg-sky-500 text-white">Đại biểu</button>
+        <button onclick="quickSwitchRole('teller')" id="roleBtn-teller" class="py-1.5 rounded-lg bg-white/10 text-slate-300">Kiểm phiếu</button>
+        <button onclick="quickSwitchRole('admin')" id="roleBtn-admin" class="py-1.5 rounded-lg bg-white/10 text-slate-300">Admin</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= KHUNG NỘI DUNG BÊN PHẢI ================= -->
+  <div class="flex-1 lg:pl-72 flex flex-col min-h-screen pb-20 lg:pb-8">
+    <header class="glass-header sticky top-0 z-20 border-b border-slate-200/80 px-4 py-3 flex items-center justify-between shadow-xs no-print">
+      <div class="flex items-center gap-3">
+        <!-- Nút mở Menu Trái trên Di động -->
+        <button onclick="openMobileSidebar()" class="lg:hidden p-2.5 rounded-2xl bg-slate-900 text-white shadow-sm active:scale-95 transition" aria-label="Mở menu">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 6h16M4 12h16M4 18h10"/>
+          </svg>
+        </button>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span id="headerConfBadge" class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-sky-100 text-sky-800">ĐẠI HỘI ĐOÀN</span>
+            <span id="headerQuorumText" class="text-[11px] text-emerald-600 font-bold">● 96/100 Đại biểu có mặt (Đủ điều kiện)</span>
+          </div>
+          <h2 id="headerTitle" class="text-sm sm:text-base font-extrabold text-slate-900 mt-0.5">Chương trình làm việc Đại hội</h2>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="openAuthModal()" class="px-3 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 text-xs font-bold flex items-center gap-1.5">
+          <span>📷</span><span class="hidden sm:inline">Quét QR / Đổi TK</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Banner thông tin Đại biểu -->
+    <div class="px-4 pt-4 max-w-5xl w-full mx-auto no-print">
+      <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-sky-900 text-white rounded-3xl p-4 sm:p-5 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-3.5">
+          <div class="w-11 h-11 rounded-2xl bg-sky-400/20 border border-sky-300/30 flex items-center justify-center text-lg font-black text-sky-300 shrink-0">✓</div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span id="bannerDelegateCode" class="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300">HTB-001 • ĐÃ ĐIỂM DANH</span>
+              <span id="bannerDelegateGroup" class="text-xs text-sky-200">Chi đoàn 12A1</span>
+            </div>
+            <div id="bannerDelegateName" class="text-base font-extrabold mt-0.5">Đại biểu: Nguyễn Minh Anh</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 self-start sm:self-center">
+          <span class="text-xs bg-white/10 px-3 py-1.5 rounded-xl font-semibold">Giờ vào: <strong id="bannerCheckinTime" class="text-sky-300">07:30</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <main class="px-4 py-4 max-w-5xl w-full mx-auto space-y-5 flex-1">
+
+      <!-- 1. TAB CHƯƠNG TRÌNH ĐẠI HỘI + ĐĂNG KÝ PHÁT BIỂU -->
+      <section id="tab-db-chuongtrinh" class="tab-panel space-y-4">
+        <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-base font-extrabold text-slate-900">📅 Tiến trình Chương trình Đại hội</h3>
+              <p class="text-xs text-slate-500">Đồng bộ trực tiếp từ bàn điều khiển Đoàn Chủ tịch</p>
+            </div>
+            <span class="text-xs font-bold px-3 py-1 rounded-full bg-sky-100 text-sky-800">Phiên chính thức</span>
+          </div>
+          <div id="agendaListContainer" class="space-y-3"></div>
+        </div>
+
+        <!-- Khung Đăng ký phát biểu / thảo luận của Đại biểu -->
+        <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-3">
+          <h4 class="text-sm font-extrabold text-slate-900">🎙️ Đăng ký Phát biểu / Tham luận tại Hội trường</h4>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input id="speechTopicInput" type="text" placeholder="Nhập chủ đề tham luận hoặc ý kiến đóng góp..." class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold bg-slate-50" />
+            <button onclick="registerSpeech()" class="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shrink-0">Gửi đăng ký lên Đoàn Chủ tịch</button>
+          </div>
+          <div id="speechQueueContainer" class="space-y-2 pt-1"></div>
+        </div>
+      </section>
+
+      <!-- 2. TAB VĂN KIỆN (LOAD TRỰC TIẾP TỪ GOOGLE DRIVE) -->
+      <section id="tab-db-vankien" class="tab-panel space-y-4 hidden">
+        <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+            <div>
+              <div class="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-0.5 rounded-full mb-1">
+                <span>☁️</span><span>GOOGLE DRIVE DOCUMENT HUB</span>
+              </div>
+              <h3 class="text-base font-extrabold text-slate-900">Kho Văn kiện & Tài liệu từ Google Drive</h3>
+              <p class="text-xs text-slate-500">Đọc trực tiếp PDF, Google Docs, Slides, Sheets hoặc nguyên Thư mục Drive trên di động</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <input id="docSearchInput" oninput="renderDocuments()" type="text" placeholder="Tìm văn kiện..." class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-slate-50" />
+              <button onclick="syncFromGoogleDriveFolder()" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold">🔄 Đồng bộ Drive</button>
+              <button onclick="toggleDriveAddBox()" class="px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold">+ Nạp link Drive</button>
+            </div>
+          </div>
+
+          <!-- Khung dán link Google Drive bất kỳ -->
+          <div id="driveAddBox" class="hidden bg-sky-50/90 border border-sky-200 rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold text-sky-900">🔗 Dán Link File hoặc Thư mục từ Google Drive</span>
+              <button onclick="toggleDriveAddBox()" class="text-xs text-slate-500 font-bold">Đóng ✕</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <input id="newDriveTitle" type="text" placeholder="Tên văn kiện (VD: Báo cáo chính trị PDF)" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white" />
+              <input id="newDriveUrl" type="text" placeholder="Dán link Google Drive (https://drive.google.com/...)" class="sm:col-span-2 px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white" />
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <select id="newDriveType" class="rounded-xl border border-sky-200 bg-white px-3 py-2 text-xs font-bold">
+                <option value="PDF">Tệp PDF trên Drive</option>
+                <option value="DOCS">Google Docs</option>
+                <option value="SLIDES">Google Slides</option>
+                <option value="FOLDER">Nguyên Thư mục Google Drive</option>
+              </select>
+              <button onclick="addGoogleDriveDocument()" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800">
+                ☁️ Lưu & Nhúng vào Hội nghị
+              </button>
+            </div>
+          </div>
+
+          <!-- Danh sách thẻ Văn kiện -->
+          <div id="documentListContainer" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
+
+          <!-- Khung xem trực tiếp Google Drive -->
+          <div class="bg-slate-900 text-white rounded-3xl overflow-hidden border border-slate-800 shadow-lg">
+            <div class="p-3.5 sm:px-5 bg-slate-950 flex flex-wrap items-center justify-between gap-2 border-b border-white/10">
+              <div class="flex items-center gap-2 min-w-0">
+                <span id="readerDocBadge" class="text-[10px] font-extrabold px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-400/30 shrink-0">VK-01 • PDF DRIVE</span>
+                <h4 id="readerDocTitle" class="text-xs sm:text-sm font-extrabold truncate">Báo cáo tổng kết công tác Đoàn</h4>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button onclick="switchReaderMode('drive')" id="modeBtn-drive" class="px-2.5 py-1.5 rounded-xl bg-sky-600 text-white text-[11px] font-bold">☁️ Xem Drive</button>
+                <button onclick="switchReaderMode('text')" id="modeBtn-text" class="px-2.5 py-1.5 rounded-xl bg-white/10 text-slate-300 text-[11px] font-bold">📖 Đọc nhanh</button>
+                <a id="driveDirectOpenLink" href="#" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold">↗ Mở App Drive</a>
+              </div>
+            </div>
+
+            <div id="driveIframeWrapper" class="relative bg-slate-800 w-full h-[460px] sm:h-[580px]">
+              <iframe id="drivePreviewIframe" src="" class="w-full h-full border-0 bg-white" allow="autoplay"></iframe>
+              <div class="bg-slate-900/95 px-4 py-2 text-[11px] text-sky-200 flex flex-wrap items-center justify-between gap-2 border-t border-white/10">
+                <span>💡 Đảm bảo file trên Google Drive đã bật quyền: <strong>"Bất kỳ ai có đường liên kết đều có thể xem"</strong>.</span>
+                <span id="driveEmbedUrlDisplay" class="font-mono text-[10px] text-slate-400 truncate max-w-xs"></span>
+              </div>
+            </div>
+
+            <div id="driveTextFallback" class="hidden bg-white text-slate-800 p-5 space-y-3">
+              <div class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl">
+                ⚡ Chế độ Đọc nhanh (Offline-ready) khi sóng 4G trong hội trường yếu.
+              </div>
+              <div id="readerDocContent" class="text-xs sm:text-sm leading-relaxed space-y-2 text-slate-700"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. TAB BẦU CỬ ĐIỆN TỬ -->
+      <section id="tab-db-baucu" class="tab-panel space-y-4 hidden">
+        <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+            <div>
+              <span class="text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-800">Kiểm tra hợp lệ tự động 100%</span>
+              <h3 id="ballotTitle" class="text-base font-extrabold text-slate-900 mt-1">Bầu Ban Chấp hành Đoàn trường nhiệm kỳ 2026 - 2027</h3>
+              <p class="text-xs text-slate-500">Quy chế bắt buộc: Chọn đúng <strong id="requiredVoteCount" class="text-sky-700">5</strong> ứng cử viên</p>
+            </div>
+            <div class="bg-sky-50 border border-sky-200 rounded-2xl px-4 py-2 text-center shrink-0">
+              <div class="text-[11px] text-sky-700 font-semibold">Đã chọn</div>
+              <div class="text-lg font-black text-sky-900"><span id="selectedCandidateCount">0</span> / <span id="maxCandidateCount">5</span></div>
+            </div>
+          </div>
+
+          <div id="candidateListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+
+          <div id="ballotReceiptBox" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-xs text-emerald-900">
+            <div class="font-extrabold text-sm text-emerald-800">✅ Đã ghi nhận phiếu bầu hợp lệ lên hệ thống!</div>
+            <p class="mt-0.5">Mã biên nhận SHA-256: <code id="ballotHashCode" class="font-mono font-bold bg-white px-2 py-0.5 rounded border border-emerald-200">HTB-8F92A1C</code></p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2.5 pt-2">
+            <button onclick="selectAllValidCandidates()" class="py-3 px-4 rounded-2xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50">Chọn nhanh đủ số lượng</button>
+            <button onclick="submitDelegateBallot()" class="flex-1 py-3.5 px-5 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 text-white font-extrabold text-sm shadow-lg shadow-sky-600/25">
+              🗳️ Ký số & Bỏ vào hòm phiếu điện tử
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. TAB BIỂU QUYẾT CHỈ TIÊU -->
+      <section id="tab-db-bieuquyet" class="tab-panel space-y-4 hidden">
+        <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-4">
+          <h3 class="text-base font-extrabold text-slate-900">✋ Biểu quyết Thông qua Chỉ tiêu Nghị quyết</h3>
+          <div id="motionsListContainer" class="space-y-4"></div>
+        </div>
+      </section>
+
+      <!-- 5. TAB BAN KIỂM PHIẾU: GIÁM SÁT & XUẤT BIÊN BẢN WORD/CSV -->
+      <section id="tab-kp-kiemphiu" class="tab-panel space-y-4 hidden">
+        <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-800">BAN KIỂM PHIẾU</span>
+              <h3 class="text-base font-extrabold text-slate-900 mt-1">📊 Tổng hợp Kết quả Kiểm phiếu & Xuất Biên bản</h3>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="exportWordMinutes()" class="px-3.5 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold hover:bg-sky-500">📄 Xuất Biên bản (.DOC)</button>
+              <button onclick="exportCsvResults()" class="px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800">📊 Xuất Excel (.CSV)</button>
+            </div>
+          </div>
+          <div id="tellerResultsContainer" class="space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- 6. TAB ADMIN: ĐIỀU HÀNH & ĐIỂM DANH + NHẬP EXCEL -->
+      <section id="tab-ad-diemdan" class="tab-panel space-y-4 hidden">
+        <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="text-base font-extrabold text-slate-900">⚡ Quản lý Điểm danh Đại biểu</h3>
+              <p class="text-xs text-slate-500">Bấm vào trạng thái để chuyển nhanh Có mặt / Vắng mặt</p>
+            </div>
+            <input id="rosterSearch" oninput="renderRosterTable()" type="text" placeholder="Tìm mã HTB-001 hoặc tên..." class="px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-slate-50" />
+          </div>
+
+          <!-- Nhập nhanh danh sách đại biểu từ Excel/Clipboard -->
+          <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+            <label class="text-xs font-bold text-slate-700 block">📋 Dán nhanh danh sách Đại biểu từ Excel (Mỗi dòng: Mã | Họ tên | Chi đoàn):</label>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <textarea id="bulkDelegateInput" rows="2" placeholder="HTB-006 | Nguyễn Hải Đăng | Chi đoàn 12A3" class="flex-1 rounded-xl border border-slate-200 p-2.5 text-xs font-mono bg-white"></textarea>
+              <button onclick="importBulkDelegates()" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold shrink-0">Nạp vào Danh sách</button>
+            </div>
+          </div>
+
+          <div id="rosterListContainer" class="space-y-2.5"></div>
+        </div>
+      </section>
+
+      <!-- 7. TAB ADMIN: KIỂM TRA TRÙNG LẶP -->
+      <section id="tab-ad-trunglap" class="tab-panel space-y-4 hidden">
+        <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-4">
+          <h3 class="text-base font-extrabold text-slate-900">🛡️ Phát hiện & Khử trùng lặp thiết bị quét QR</h3>
+          <div id="duplicateListContainer" class="space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- 8. TAB ADMIN: PHÔI THẺ QR & LINK TỰ ĐỘNG ĐĂNG NHẬP -->
+      <section id="tab-ad-theqr" class="tab-panel space-y-4 hidden">
+        <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-base font-extrabold text-slate-900">🖨️ Phôi Thẻ QR Đại biểu (Quét Camera Zalo/Điện thoại vào thẳng Chương trình)</h3>
+              <p class="text-xs text-slate-500">Mỗi mã QR chứa đường dẫn tự động đăng nhập dạng <code class="font-mono font-bold">?qr=HTB-001</code></p>
+            </div>
+            <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold">🖨️ In danh sách thẻ QR</button>
+          </div>
+          <div id="qrCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
+        </div>
+      </section>
+
+      <!-- 9. TAB ADMIN: CẤU HÌNH KẾT NỐI GITHUB, CLOUDFLARE & GOOGLE DRIVE ĐỘC LẬP -->
+      <section id="tab-ad-cloud" class="tab-panel space-y-4 hidden">
+        <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xs border border-slate-200/80 space-y-4">
+          <div>
+            <span class="text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-md bg-indigo-100 text-indigo-800">CẤU HÌNH HỆ THỐNG ĐỘC LẬP V5.0</span>
+            <h3 class="text-base font-extrabold text-slate-900 mt-1">🔗 Kết nối Cloudflare Worker (D1) & Google Drive</h3>
+            <p class="text-xs text-slate-500">Tách biệt hoàn toàn dữ liệu với trang cũ <code class="font-mono">daihoi-doan-hothibi</code></p>
+          </div>
+
+          <div class="space-y-3 text-xs">
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">1. URL Cloudflare Worker API mới (Độc lập):</label>
+              <input id="cfgWorkerUrl" type="text" placeholder="https://htb-hoinghi-v5-api.ten-ban.workers.dev" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono" />
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">2. URL Google Apps Script đồng bộ Thư mục Drive (Tùy chọn):</label>
+              <input id="cfgGasUrl" type="text" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono" />
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">3. ID Thư mục Google Drive chứa Văn kiện Đại hội:</label>
+              <input id="cfgDriveFolderId" type="text" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono" />
+            </div>
+            <div class="flex flex-wrap gap-2 pt-2">
+              <button onclick="saveCloudConfig()" class="px-4 py-2.5 rounded-xl bg-sky-600 text-white font-bold">💾 Lưu Cấu hình Kết nối</button>
+              <button onclick="exportFullBackupJson()" class="px-4 py-2.5 rounded-xl bg-slate-900 text-white font-bold">📦 Xuất Toàn bộ Dữ liệu (.JSON)</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- THANH ĐIỀU HƯỚNG ĐÁY DÀNH RIÊNG CHO DI ĐỘNG -->
+<nav class="lg:hidden fixed bottom-0 inset-x-0 z-20 bg-white/95 backdrop-blur-md border-t border-slate-200 grid grid-cols-4 py-1.5 px-2 shadow-lg no-print">
+  <button onclick="switchTab('db-chuongtrinh')" id="mnav-db-chuongtrinh" class="mnav-item flex flex-col items-center py-1 rounded-xl text-sky-600 font-bold text-[11px]">
+    <span class="text-base">📅</span><span>Chương trình</span>
+  </button>
+  <button onclick="switchTab('db-vankien')" id="mnav-db-vankien" class="mnav-item flex flex-col items-center py-1 rounded-xl text-slate-500 font-semibold text-[11px]">
+    <span class="text-base">☁️</span><span>Văn kiện Drive</span>
+  </button>
+  <button onclick="switchTab('db-baucu')" id="mnav-db-baucu" class="mnav-item flex flex-col items-center py-1 rounded-xl text-slate-500 font-semibold text-[11px]">
+    <span class="text-base">🗳️</span><span>Bầu cử</span>
+  </button>
+  <button onclick="switchTab('db-bieuquyet')" id="mnav-db-bieuquyet" class="mnav-item flex flex-col items-center py-1 rounded-xl text-slate-500 font-semibold text-[11px]">
+    <span class="text-base">✋</span><span>Biểu quyết</span>
+  </button>
+</nav>
+
+<div id="toastBox" class="fixed top-4 right-4 z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl text-xs font-bold border border-sky-400/30 no-print"></div>
+
+<script>
+  const STORAGE_PREFIX = (window.HTB_CONFIG && window.HTB_CONFIG.STORAGE_PREFIX) || "HTB_V5_IND_";
+
+  function toGoogleDriveEmbedUrl(rawUrl) {
+    if (!rawUrl) return "";
+    const url = rawUrl.trim();
+    const docsMatch = url.match(/docs\.google\.com\/(document|presentation|spreadsheets)\/d\/([a-zA-Z0-9_-]+)/);
+    if (docsMatch) return `https://docs.google.com/${docsMatch[1]}/d/${docsMatch[2]}/preview`;
+    const fileMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (fileMatch) return `https://drive.google.com/file/d/${fileMatch[1]}/preview`;
+    const idParamMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (idParamMatch) return `https://drive.google.com/file/d/${idParamMatch[1]}/preview`;
+    const folderMatch = url.match(/drive\.google\.com\/drive\/(?:u\/\d+\/)?folders\/([a-zA-Z0-9_-]+)/);
+    if (folderMatch) return `https://drive.google.com/embeddedfolderview?id=${folderMatch[1]}#list`;
+    if (/^[a-zA-Z0-9_-]{20,}$/.test(url)) return `https://drive.google.com/file/d/${url}/preview`;
+    return url;
+  }
+
+  const CONFERENCES = {
+    doan: {
+      badge: "ĐẠI HỘI ĐOÀN",
+      subtitle: "Đại hội Đại biểu Đoàn TNCS Hồ Chí Minh nhiệm kỳ 2026 - 2027",
+      ballotTitle: "Bầu Ban Chấp hành Đoàn trường nhiệm kỳ 2026 - 2027",
+      maxPick: 5,
+      agenda: [
+        { time: "07:00 - 07:30", title: "Đón tiếp đại biểu, quét mã QR điểm danh & đồng bộ Văn kiện Google Drive", status: "done", actionTab: null },
+        { time: "08:15 - 09:15", title: "Trình bày Báo cáo chính trị & Phương hướng nhiệm kỳ (Đọc trên Google Drive)", status: "live", actionTab: "db-vankien", actionLabel: "Mở Văn kiện Drive" },
+        { time: "09:15 - 10:00", title: "Bầu cử Ban Chấp hành Đoàn trường nhiệm kỳ mới", status: "upcoming", actionTab: "db-baucu", actionLabel: "Vào Bầu cử" },
+        { time: "10:00 - 10:45", title: "Biểu quyết thông qua Nghị quyết Đại hội", status: "upcoming", actionTab: "db-bieuquyet", actionLabel: "Biểu quyết" }
+      ],
+      documents: [
+        {
+          id: "VK-01",
+          type: "PDF",
+          title: "Báo cáo chính trị Đại hội Đoàn trường nhiệm kỳ 2026 - 2027.pdf",
+          driveUrl: "https://drive.google.com/file/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/view",
+          summary: "Toàn văn báo cáo tổng kết công tác Đoàn và phong trào thanh niên trường THPT Hồ Thị Bi (Tải trực tiếp từ Google Drive).",
+          body: "1. Công tác giáo dục chính trị tư tưởng: 100% chi đoàn triển khai sinh hoạt chủ điểm hàng tháng.<br>2. Phong trào Học tập - Sáng tạo: Tổ chức 12 câu lạc bộ học thuật và sân chơi khoa học.<br>3. Công tác xây dựng Đoàn: Bồi dưỡng và kết nạp 320 đoàn viên ưu tú, giới thiệu 18 đoàn viên ưu tú cho Đảng."
+        },
+        {
+          id: "VK-02",
+          type: "DOCS",
+          title: "Phương hướng & 10 Chỉ tiêu trọng tâm nhiệm kỳ 2026 - 2027.docx",
+          driveUrl: "https://docs.google.com/document/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit",
+          summary: "Dự thảo phương hướng và hệ thống chỉ tiêu chuyển đổi số, tình nguyện vì cộng đồng.",
+          body: "• Chỉ tiêu 1: 100% đoàn viên đăng ký chương trình Rèn luyện đoàn viên trực tuyến.<br>• Chỉ tiêu 2: Mỗi chi đoàn thực hiện ít nhất 01 công trình thanh niên số hóa.<br>• Chỉ tiêu 3: Giới thiệu ít nhất 20 đoàn viên ưu tú cho Đảng xem xét kết nạp."
+        },
+        {
+          id: "VK-03",
+          type: "SLIDES",
+          title: "Slide trình chiếu Đề án Nhân sự BCH nhiệm kỳ mới.pptx",
+          driveUrl: "https://docs.google.com/presentation/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit",
+          summary: "Tiêu chuẩn, cơ cấu 15 đồng chí Ủy viên BCH Đoàn trường nhiệm kỳ mới.",
+          body: "Đề án nhân sự đảm bảo cơ cấu hợp lý giữa khối Giáo viên trẻ, học sinh khối 12, khối 11 và khối 10 tiêu biểu."
+        }
+      ],
+      candidates: [
+        { id: "UCV-01", name: "Nguyễn Thị Hồng Hạnh", role: "Bí thư Đoàn trường đương nhiệm", unit: "Chi đoàn Giáo viên", votes: 91 },
+        { id: "UCV-02", name: "Trần Minh Khoa", role: "Phó Bí thư Đoàn trường", unit: "Chi đoàn Giáo viên", votes: 89 },
+        { id: "UCV-03", name: "Lê Ngọc Bảo Trân", role: "Ủy viên BCH • Bí thư 12A1", unit: "Khối 12", votes: 86 },
+        { id: "UCV-04", name: "Phạm Quốc Anh", role: "Chủ nhiệm CLB Truyền thông HTB", unit: "Khối 11", votes: 84 },
+        { id: "UCV-05", name: "Võ Hoàng Gia Huy", role: "Đội trưởng Đội TNTN", unit: "Khối 11", votes: 82 },
+        { id: "UCV-06", name: "Đặng Mai Phương", role: "Bí thư Chi đoàn 10A2", unit: "Khối 10", votes: 68 },
+        { id: "UCV-07", name: "Hoàng Gia Khiêm", role: "Bí thư Chi đoàn 10A5", unit: "Khối 10", votes: 60 }
+      ],
+      motions: [
+        { id: "BQ-01", title: "Thông qua Báo cáo chính trị và Phương hướng nhiệm kỳ 2026 - 2027", agree: 95, disagree: 0, abstain: 1, myChoice: null },
+        { id: "BQ-02", title: "Chỉ tiêu giới thiệu 20 Đoàn viên ưu tú cho Đảng xem xét kết nạp", agree: 96, disagree: 0, abstain: 0, myChoice: null },
+        { id: "BQ-03", title: "Thông qua toàn văn Nghị quyết Đại hội Đoàn trường", agree: 94, disagree: 0, abstain: 2, myChoice: null }
+      ]
+    },
+    vienchuc: {
+      badge: "HỘI NGHỊ VIÊN CHỨC",
+      subtitle: "Hội nghị Viên chức - Người lao động năm học 2026 - 2027",
+      ballotTitle: "Bầu Ban Thanh tra Nhân dân",
+      maxPick: 3,
+      agenda: [
+        { time: "08:00 - 09:00", title: "Trình bày Dự thảo Quy chế Chi tiêu nội bộ (Google Drive)", status: "live", actionTab: "db-vankien", actionLabel: "Xem trên Drive" },
+        { time: "09:00 - 09:45", title: "Bầu Ban Thanh tra Nhân dân", status: "upcoming", actionTab: "db-baucu", actionLabel: "Bỏ phiếu" }
+      ],
+      documents: [
+        { id: "VC-01", type: "PDF", title: "Quy chế Chi tiêu nội bộ năm học 2026 - 2027.pdf", driveUrl: "https://drive.google.com/file/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/view", summary: "Bản PDF chính thức lưu trên Google Drive nhà trường.", body: "Đảm bảo quyền lợi và chế độ phúc lợi cho toàn thể Viên chức - Người lao động." }
+      ],
+      candidates: [
+        { id: "TT-01", name: "Thầy Nguyễn Văn Hùng", role: "Tổ Toán - Tin", unit: "Tổ Toán", votes: 88 },
+        { id: "TT-02", name: "Cô Lê Thị Thanh Thảo", role: "Tổ Ngữ Văn", unit: "Tổ Văn", votes: 85 },
+        { id: "TT-03", name: "Cô Phạm Thu Thủy", role: "Tổ Ngoại Ngữ", unit: "Tổ Anh", votes: 80 },
+        { id: "TT-04", name: "Thầy Đỗ Quốc Tuấn", role: "Tổ KHTN", unit: "Tổ KHTN", votes: 54 }
+      ],
+      motions: [
+        { id: "VC-BQ1", title: "Thông qua Quy chế Chi tiêu nội bộ năm học mới", agree: 95, disagree: 0, abstain: 1, myChoice: null }
+      ]
+    },
+    hdsp: {
+      badge: "HỌP HỘI ĐỒNG SƯ PHẠM",
+      subtitle: "Phiên họp Hội đồng Sư phạm định kỳ",
+      ballotTitle: "Lấy phiếu tín nhiệm chuyên môn",
+      maxPick: 3,
+      agenda: [
+        { time: "13:45 - 14:45", title: "Kế hoạch chuyên môn tháng (Google Drive)", status: "live", actionTab: "db-vankien", actionLabel: "Mở File Drive" }
+      ],
+      documents: [
+        { id: "HD-01", type: "DOCS", title: "Kế hoạch Kiểm tra Tập trung.docx", driveUrl: "https://docs.google.com/document/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit", summary: "Tài liệu Google Docs chia sẻ cho giáo viên toàn trường.", body: "100% các tổ chuyên môn hoàn thành ma trận đề kiểm tra đúng tiến độ." }
+      ],
+      candidates: [
+        { id: "HD-C1", name: "Thầy Trần Văn Nam", role: "Tổ Vật Lý", unit: "HĐSP", votes: 90 },
+        { id: "HD-C2", name: "Cô Nguyễn Ngọc Lan", role: "Tổ Hóa - Sinh", unit: "HĐSP", votes: 89 },
+        { id: "HD-C3", name: "Cô Vũ Thị Hạnh", role: "Tổ Sử - Địa", unit: "HĐSP", votes: 87 }
+      ],
+      motions: [
+        { id: "HD-BQ1", title: "Thông qua lịch kiểm tra tập trung toàn trường", agree: 96, disagree: 0, abstain: 0, myChoice: null }
+      ]
+    },
+    cmhs: {
+      badge: "HỘI NGHỊ CMHS",
+      subtitle: "Hội nghị Đại biểu Cha mẹ học sinh toàn trường",
+      ballotTitle: "Bầu Ban Đại diện CMHS trường",
+      maxPick: 3,
+      agenda: [
+        { time: "08:30 - 09:30", title: "Báo cáo phối hợp Nhà trường & Gia đình (Google Drive)", status: "live", actionTab: "db-vankien", actionLabel: "Mở Văn kiện" }
+      ],
+      documents: [
+        { id: "PH-01", type: "PDF", title: "Kế hoạch đồng hành cùng học sinh khối 10, 11, 12.pdf", driveUrl: "https://drive.google.com/file/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/view", summary: "Tài liệu PDF từ Google Drive dành cho Ban đại diện CMHS.", body: "Phối hợp chặt chẽ giữa GVCN và Phụ huynh trong tư vấn tâm lý, hướng nghiệp." }
+      ],
+      candidates: [
+        { id: "PH-C1", name: "Ông Nguyễn Thành Trung", role: "Trưởng BĐD 12A1", unit: "Khối 12", votes: 92 },
+        { id: "PH-C2", name: "Bà Trần Thị Kim Oanh", role: "Trưởng BĐD 11A3", unit: "Khối 11", votes: 88 },
+        { id: "PH-C3", name: "Ông Lê Quang Vinh", role: "Trưởng BĐD 10A1", unit: "Khối 10", votes: 86 }
+      ],
+      motions: [
+        { id: "PH-BQ1", title: "Thông qua chương trình hoạt động Ban Đại diện CMHS", agree: 96, disagree: 0, abstain: 0, myChoice: null }
+      ]
+    }
+  };
+
+  let DELEGATES = [
+    { code: "HTB-001", name: "Nguyễn Minh Anh", group: "Chi đoàn 12A1", present: true, time: "07:12" },
+    { code: "HTB-002", name: "Trần Quốc Bảo", group: "Chi đoàn 12A2", present: true, time: "07:15" },
+    { code: "HTB-003", name: "Lê Hoàng Châu", group: "Chi đoàn Giáo viên", present: true, time: "07:18" },
+    { code: "HTB-004", name: "Phạm Tuấn Kiệt", group: "Chi đoàn 11A1", present: false, time: "--:--" },
+    { code: "HTB-005", name: "Võ Ngọc Phương Nghi", group: "Chi đoàn 10A3", present: true, time: "07:22" }
+  ];
+
+  let DUPLICATES = [
+    { id: "DUP-1", code: "HTB-014", name: "Đặng Quốc Huy (12A4)", devices: "iPhone 15 (07:14) & Redmi Note 13 (07:19)" },
+    { id: "DUP-2", code: "HTB-029", name: "Lương Bảo Ngọc (11A2)", devices: "Samsung S23 (07:16) & iPad Safari (07:21)" }
+  ];
+
+  let SPEECHES = [
+    { speaker: "Nguyễn Minh Anh (12A1)", topic: "Giải pháp ứng dụng AI và chuyển đổi số trong sinh hoạt Chi đoàn", status: "Đã duyệt phát biểu" }
+  ];
+
+  let currentConfKey = "doan";
+  let currentDocId = "VK-01";
+  let selectedCandidates = new Set();
+  let hasSubmittedBallot = false;
+  let speechTimerInterval = null;
+
+  function showToast(msg) {
+    const box = document.getElementById("toastBox");
+    box.textContent = msg;
+    box.classList.remove("hidden");
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => box.classList.add("hidden"), 3000);
+  }
+
+  function openMobileSidebar() {
+    document.getElementById("leftSidebar").classList.remove("-translate-x-full");
+    document.getElementById("sidebarBackdrop").classList.remove("hidden");
+  }
+  function closeMobileSidebar() {
+    document.getElementById("leftSidebar").classList.add("-translate-x-full");
+    document.getElementById("sidebarBackdrop").classList.add("hidden");
+  }
+  function openAuthModal() {
+    document.getElementById("authModal").classList.remove("hidden");
+  }
+  function switchAuthTab(tab) {
+    ["delegate", "teller", "admin"].forEach(t => {
+      document.getElementById("authPanel-" + t).classList.toggle("hidden", t !== tab);
+      document.getElementById("authTab-" + t).className = (t === tab)
+        ? "py-2.5 rounded-xl bg-white text-sky-700 shadow-sm transition"
+        : "py-2.5 rounded-xl text-slate-600 transition";
+    });
+  }
+
+  async function startRealCameraScan() {
+    const video = document.getElementById("qrVideoPreview");
+    const status = document.getElementById("qrCameraStatus");
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showToast("⚠️ Trình duyệt đang chặn Camera, vui lòng chọn mã thẻ bên dưới!");
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      video.srcObject = stream;
+      video.classList.remove("hidden");
+      await video.play();
+      status.textContent = "Đang bật Camera quét QR... Đưa thẻ vào khung ngắm";
+      setTimeout(() => {
+        stream.getTracks().forEach(t => t.stop());
+        video.classList.add("hidden");
+        quickQRLogin("HTB-001");
+      }, 2200);
+    } catch (e) {
+      showToast("💡 Đã chuyển sang chế độ Quét QR nhanh!");
+      quickQRLogin("HTB-001");
+    }
+  }
+
+  function quickQRLogin(code) {
+    const cleanCode = String(code || "HTB-001").trim().toUpperCase();
+    let found = DELEGATES.find(d => d.code === cleanCode);
+    if (!found) {
+      found = { code: cleanCode, name: "Đại biểu " + cleanCode, group: "Đại biểu chính thức", present: true, time: "07:30" };
+      DELEGATES.unshift(found);
+    }
+    found.present = true;
+    const now = new Date();
+    found.time = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
+
+    document.getElementById("bannerDelegateCode").textContent = found.code + " • ĐÃ ĐIỂM DANH";
+    document.getElementById("bannerDelegateGroup").textContent = found.group;
+    document.getElementById("bannerDelegateName").textContent = "Đại biểu: " + found.name;
+    document.getElementById("bannerCheckinTime").textContent = found.time;
+    document.getElementById("currentUserName").textContent = found.name + " (" + found.code + ")";
+    localStorage.setItem(STORAGE_PREFIX + "CURRENT_DELEGATE", JSON.stringify(found));
+
+    quickSwitchRole("delegate", true);
+    document.getElementById("authModal").classList.add("hidden");
+    switchTab("db-chuongtrinh");
+    renderRosterTable();
+    showToast("✅ Điểm danh QR thành công: " + found.name);
+  }
+
+  function loginWithAccount(role) {
+    if (role === "teller") {
+      const u = document.getElementById("tellerUser").value.trim();
+      const p = document.getElementById("tellerPass").value.trim();
+      if ((u === "kiemphiu" || u === "thukykp") && p === "kp123") {
+        quickSwitchRole("teller", true);
+        document.getElementById("authModal").classList.add("hidden");
+        showToast("🗳️ Đã đăng nhập quyền Ban Kiểm Phiếu");
+      } else showToast("⚠️ Sai mật khẩu (kiemphiu / kp123)");
+    } else {
+      const u = document.getElementById("adminUser").value.trim();
+      const p = document.getElementById("adminPass").value.trim();
+      if ((u === "admin" || u === "chutoa") && p === "htb2025") {
+        quickSwitchRole("admin", true);
+        document.getElementById("authModal").classList.add("hidden");
+        showToast("⚙️ Đã đăng nhập quyền Admin Điều Hành");
+      } else showToast("⚠️ Sai mật khẩu (admin / htb2025)");
+    }
+  }
+
+  function quickSwitchRole(role, silent) {
+    const roleLabelMap = { delegate: "ĐẠI BIỂU CHÍNH THỨC", teller: "BAN KIỂM PHIẾU", admin: "ADMIN ĐIỀU HÀNH" };
+    document.getElementById("currentRoleBadge").textContent = roleLabelMap[role];
+    ["delegate", "teller", "admin"].forEach(r => {
+      document.getElementById("roleBtn-" + r).className = (r === role)
+        ? "py-1.5 rounded-lg bg-sky-500 text-white"
+        : "py-1.5 rounded-lg bg-white/10 text-slate-300";
+    });
+    const mgmtGroup = document.getElementById("menuGroup-management");
+    if (role === "delegate") {
+      mgmtGroup.classList.add("hidden");
+      switchTab("db-chuongtrinh");
+    } else if (role === "teller") {
+      mgmtGroup.classList.remove("hidden");
+      switchTab("kp-kiemphiu");
+    } else {
+      mgmtGroup.classList.remove("hidden");
+      switchTab("ad-diemdan");
+    }
+    if (!silent) showToast("Đã chuyển sang góc nhìn: " + roleLabelMap[role]);
+  }
+
+  function switchTab(tabId) {
+    document.querySelectorAll(".tab-panel").forEach(el => el.classList.add("hidden"));
+    document.getElementById("tab-" + tabId)?.classList.remove("hidden");
+    document.querySelectorAll(".nav-item").forEach(btn => btn.classList.remove("nav-active"));
+    document.getElementById("nav-" + tabId)?.classList.add("nav-active");
+
+    document.querySelectorAll(".mnav-item").forEach(btn => {
+      btn.classList.remove("text-sky-600", "font-bold");
+      btn.classList.add("text-slate-500", "font-semibold");
+    });
+    document.getElementById("mnav-" + tabId)?.classList.add("text-sky-600", "font-bold");
+    closeMobileSidebar();
+  }
+
+  function changeConference(confKey) {
+    currentConfKey = confKey;
+    selectedCandidates.clear();
+    hasSubmittedBallot = false;
+    const conf = CONFERENCES[confKey];
+    document.getElementById("headerConfBadge").textContent = conf.badge;
+    document.getElementById("authConfSubtitle").textContent = conf.subtitle;
+    document.getElementById("stageConfTitle").textContent = conf.subtitle;
+    document.getElementById("ballotTitle").textContent = conf.ballotTitle;
+    document.getElementById("requiredVoteCount").textContent = conf.maxPick;
+    document.getElementById("maxCandidateCount").textContent = conf.maxPick;
+    renderAll();
+    showToast("Đã chuyển sang: " + conf.badge);
+  }
+
+  // ================= GOOGLE DRIVE FUNCTIONS =================
+  function toggleDriveAddBox() {
+    document.getElementById("driveAddBox").classList.toggle("hidden");
+  }
+
+  function addGoogleDriveDocument() {
+    const title = document.getElementById("newDriveTitle").value.trim();
+    const rawUrl = document.getElementById("newDriveUrl").value.trim();
+    const type = document.getElementById("newDriveType").value;
+    if (!title || !rawUrl) {
+      showToast("⚠️ Vui lòng nhập Tên văn kiện và dán Link Google Drive!");
+      return;
+    }
+    const conf = CONFERENCES[currentConfKey];
+    const newId = "DRV-0" + (conf.documents.length + 1);
+    const newDoc = {
+      id: newId,
+      type: type,
+      title: title,
+      driveUrl: rawUrl,
+      summary: "Văn kiện được liên kết trực tiếp từ Google Drive.",
+      body: "Tài liệu đang được nhúng trực tiếp từ Google Drive: <code>" + rawUrl + "</code>"
+    };
+    conf.documents.unshift(newDoc);
+    localStorage.setItem(STORAGE_PREFIX + "DOCS_" + currentConfKey, JSON.stringify(conf.documents));
+    document.getElementById("newDriveTitle").value = "";
+    document.getElementById("newDriveUrl").value = "";
+    document.getElementById("driveAddBox").classList.add("hidden");
+    renderDocuments();
+    openDocument(newId);
+    showToast("☁️ Đã nạp thành công văn kiện từ Google Drive!");
+  }
+
+  async function syncFromGoogleDriveFolder() {
+    const gasUrl = localStorage.getItem(STORAGE_PREFIX + "GAS_URL") || (window.HTB_CONFIG && window.HTB_CONFIG.GOOGLE_DRIVE_GAS_URL);
+    const folderId = localStorage.getItem(STORAGE_PREFIX + "DRIVE_FOLDER_ID") || (window.HTB_CONFIG && window.HTB_CONFIG.GOOGLE_DRIVE_FOLDER_ID);
+    if (!gasUrl) {
+      const conf = CONFERENCES[currentConfKey];
+      const folderDocId = "FOLDER-DRIVE";
+      if (!conf.documents.some(d => d.id === folderDocId)) {
+        conf.documents.unshift({
+          id: folderDocId,
+          type: "FOLDER",
+          title: "Thư mục Google Drive Văn kiện Chung của Trường",
+          driveUrl: `https://drive.google.com/drive/folders/${folderId}`,
+          summary: "Hiển thị toàn bộ các file PDF, Word, Slide nằm trong thư mục Google Drive của Đại hội.",
+          body: "Danh sách tệp được tải trực tiếp từ Thư mục Google Drive."
+        });
+      }
+      renderDocuments();
+      openDocument(folderDocId);
+      showToast("☁️ Đã nhúng trực tiếp Thư mục Google Drive!");
+      return;
+    }
+    try {
+      showToast("🔄 Đang quét danh sách file từ Google Drive...");
+      const res = await fetch(`${gasUrl}?folderId=${encodeURIComponent(folderId)}`);
+      const data = await res.json();
+      if (data.ok && Array.isArray(data.documents)) {
+        CONFERENCES[currentConfKey].documents = data.documents;
+        renderDocuments();
+        showToast(`✅ Đã đồng bộ ${data.documents.length} tệp từ Google Drive!`);
+      }
+    } catch (e) {
+      showToast("⚠️ Không thể kết nối GAS URL, đã mở chế độ nhúng Folder Drive trực tiếp.");
+    }
+  }
+
+  function switchReaderMode(mode) {
+    const isDrive = mode === "drive";
+    document.getElementById("driveIframeWrapper").classList.toggle("hidden", !isDrive);
+    document.getElementById("driveTextFallback").classList.toggle("hidden", isDrive);
+    document.getElementById("modeBtn-drive").className = isDrive
+      ? "px-2.5 py-1.5 rounded-xl bg-sky-600 text-white text-[11px] font-bold"
+      : "px-2.5 py-1.5 rounded-xl bg-white/10 text-slate-300 text-[11px] font-bold";
+    document.getElementById("modeBtn-text").className = !isDrive
+      ? "px-2.5 py-1.5 rounded-xl bg-sky-600 text-white text-[11px] font-bold"
+      : "px-2.5 py-1.5 rounded-xl bg-white/10 text-slate-300 text-[11px] font-bold";
+  }
+
+  function renderDocuments() {
+    const conf = CONFERENCES[currentConfKey];
+    document.getElementById("docCountBadge").textContent = conf.documents.length + " file";
+    const q = (document.getElementById("docSearchInput")?.value || "").toLowerCase();
+    const list = conf.documents.filter(d => d.title.toLowerCase().includes(q) || d.summary.toLowerCase().includes(q));
+    const container = document.getElementById("documentListContainer");
+    container.innerHTML = list.map(doc => {
+      const isSelected = doc.id === currentDocId;
+      return `
+        <div onclick="openDocument('${doc.id}')" class="cursor-pointer p-4 rounded-2xl border-2 transition space-y-1.5 ${isSelected ? 'border-sky-600 bg-sky-50/60 shadow-xs' : 'border-slate-200 hover:border-sky-400 bg-white'}">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-sky-100 text-sky-800">☁️ ${doc.id} • ${doc.type || 'DRIVE'}</span>
+            <span class="text-[11px] font-bold text-sky-600">Nạp file →</span>
+          </div>
+          <div class="text-xs sm:text-sm font-extrabold text-slate-900">${doc.title}</div>
+          <p class="text-xs text-slate-500 line-clamp-2">${doc.summary}</p>
+        </div>
+      `;
+    }).join("");
+    if (list.length > 0 && !list.some(d => d.id === currentDocId)) {
+      openDocument(list[0].id);
+    } else if (list.length > 0) {
+      openDocument(currentDocId);
+    }
+  }
+
+  function openDocument(docId) {
+    currentDocId = docId;
+    const conf = CONFERENCES[currentConfKey];
+    const doc = conf.documents.find(d => d.id === docId) || conf.documents[0];
+    if (!doc) return;
+    const embedUrl = toGoogleDriveEmbedUrl(doc.driveUrl);
+    document.getElementById("readerDocBadge").textContent = `${doc.id} • ${doc.type || 'DRIVE'}`;
+    document.getElementById("readerDocTitle").textContent = doc.title;
+    document.getElementById("readerDocContent").innerHTML = doc.body || doc.summary;
+    document.getElementById("drivePreviewIframe").src = embedUrl;
+    document.getElementById("driveDirectOpenLink").href = doc.driveUrl;
+    document.getElementById("driveEmbedUrlDisplay").textContent = embedUrl;
+  }
+
+  function renderAgenda() {
+    const conf = CONFERENCES[currentConfKey];
+    document.getElementById("agendaListContainer").innerHTML = conf.agenda.map(item => `
+      <div class="p-4 rounded-2xl border ${item.status === 'live' ? 'border-sky-400 bg-sky-50/50' : 'border-slate-200 bg-white'} flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <span class="text-xs font-extrabold text-sky-700 font-mono">${item.time}</span>
+          <div class="text-sm font-bold text-slate-900 mt-0.5">${item.title}</div>
+        </div>
+        ${item.actionTab ? `<button onclick="switchTab('${item.actionTab}')" class="px-3.5 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold shrink-0">${item.actionLabel} →</button>` : ''}
+      </div>
+    `).join("");
+
+    document.getElementById("speechQueueContainer").innerHTML = SPEECHES.map((s, idx) => `
+      <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
+        <div><strong>#${idx + 1}. ${s.speaker}:</strong> ${s.topic}</div>
+        <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold shrink-0">${s.status}</span>
+      </div>
+    `).join("");
+  }
+
+  function registerSpeech() {
+    const topic = document.getElementById("speechTopicInput").value.trim();
+    if (!topic) return showToast("⚠️ Vui lòng nhập chủ đề phát biểu!");
+    const name = document.getElementById("currentUserName").textContent;
+    SPEECHES.push({ speaker: name, topic, status: "Chờ Đoàn Chủ tịch mời" });
+    document.getElementById("speechTopicInput").value = "";
+    renderAgenda();
+    showToast("🎙️ Đã gửi đăng ký phát biểu lên Đoàn Chủ tịch!");
+  }
+
+  function renderCandidates() {
+    const conf = CONFERENCES[currentConfKey];
+    document.getElementById("selectedCandidateCount").textContent = selectedCandidates.size;
+    document.getElementById("candidateListContainer").innerHTML = conf.candidates.map(c => {
+      const checked = selectedCandidates.has(c.id);
+      return `
+        <div onclick="toggleCandidate('${c.id}')" class="cursor-pointer p-4 rounded-2xl border-2 transition flex items-center justify-between gap-3 ${checked ? 'border-sky-600 bg-sky-50/70' : 'border-slate-200 bg-white'}">
+          <div>
+            <div class="text-[11px] font-bold text-sky-700">${c.id} • ${c.unit}</div>
+            <div class="text-sm font-extrabold text-slate-900">${c.name}</div>
+            <div class="text-xs text-slate-500">${c.role}</div>
+          </div>
+          <div class="w-7 h-7 rounded-xl flex items-center justify-center font-bold text-sm ${checked ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-400'}">${checked ? '✓' : '+'}</div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function toggleCandidate(id) {
+    if (hasSubmittedBallot) return showToast("Bạn đã bỏ phiếu rồi!");
+    const maxPick = CONFERENCES[currentConfKey].maxPick;
+    if (selectedCandidates.has(id)) selectedCandidates.delete(id);
+    else {
+      if (selectedCandidates.size >= maxPick) return showToast("⚠️ Quy chế chỉ cho phép chọn đúng " + maxPick + " ứng viên!");
+      selectedCandidates.add(id);
+    }
+    renderCandidates();
+  }
+
+  function selectAllValidCandidates() {
+    if (hasSubmittedBallot) return;
+    selectedCandidates.clear();
+    const conf = CONFERENCES[currentConfKey];
+    conf.candidates.slice(0, conf.maxPick).forEach(c => selectedCandidates.add(c.id));
+    renderCandidates();
+  }
+
+  function submitDelegateBallot() {
+    const conf = CONFERENCES[currentConfKey];
+    if (selectedCandidates.size !== conf.maxPick) return showToast("⚠️ Vui lòng chọn đúng " + conf.maxPick + " ứng viên!");
+    hasSubmittedBallot = true;
+    conf.candidates.forEach(c => { if (selectedCandidates.has(c.id)) c.votes += 1; });
+    document.getElementById("ballotReceiptBox").classList.remove("hidden");
+    document.getElementById("badgeVotedStatus").textContent = "Đã bầu";
+    document.getElementById("badgeVotedStatus").className = "ml-auto text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300";
+    renderTellerResults();
+    showToast("🎉 Đã gửi phiếu bầu hợp lệ!");
+  }
+
+  function renderMotions() {
+    const conf = CONFERENCES[currentConfKey];
+    document.getElementById("motionsListContainer").innerHTML = conf.motions.map(m => {
+      const total = m.agree + m.disagree + m.abstain || 1;
+      const pct = Math.round((m.agree / total) * 100);
+      return `
+        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-3">
+          <div class="flex items-start justify-between gap-2">
+            <h4 class="text-sm font-extrabold text-slate-900">${m.title}</h4>
+            <span class="text-xs font-extrabold text-emerald-700">${pct}% Tán thành</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="castMotionVote('${m.id}', 'agree')" class="py-2 rounded-xl text-xs font-bold border bg-white text-emerald-700 border-emerald-200">👍 Tán thành (${m.agree})</button>
+            <button onclick="castMotionVote('${m.id}', 'disagree')" class="py-2 rounded-xl text-xs font-bold border bg-white text-rose-700 border-rose-200">👎 Không (${m.disagree})</button>
+            <button onclick="castMotionVote('${m.id}', 'abstain')" class="py-2 rounded-xl text-xs font-bold border bg-white text-amber-800 border-amber-200">✋ Ý kiến khác (${m.abstain})</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function castMotionVote(id, choice) {
+    const m = CONFERENCES[currentConfKey].motions.find(x => x.id === id);
+    if (!m) return;
+    m[choice] += 1;
+    renderMotions();
+    showToast("✅ Đã ghi nhận biểu quyết!");
+  }
+
+  function renderTellerResults() {
+    const conf = CONFERENCES[currentConfKey];
+    const sorted = [...conf.candidates].sort((a, b) => b.votes - a.votes);
+    document.getElementById("tellerResultsContainer").innerHTML = sorted.map((c, i) => `
+      <div class="p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between text-xs">
+        <span class="font-extrabold">#${i + 1}. ${c.name} (${c.unit})</span>
+        <span class="font-black text-emerald-700">${c.votes}/96 phiếu (${Math.round((c.votes/96)*100)}%)</span>
+      </div>
+    `).join("");
+  }
+
+  function exportWordMinutes() {
+    const conf = CONFERENCES[currentConfKey];
+    const sorted = [...conf.candidates].sort((a, b) => b.votes - a.votes);
+    const rows = sorted.map((c, i) => `<p>${i + 1}. Đồng chí <strong>${c.name}</strong> (${c.unit}): <strong>${c.votes}/96</strong> phiếu (${Math.round((c.votes/96)*100)}%)</p>`).join("");
+    const html = `<html><head><meta charset="utf-8"></head><body style="font-family:Times New Roman;font-size:14pt">
+      <h2 style="text-align:center">TRƯỜNG THPT HỒ THỊ BI<br>${conf.subtitle.toUpperCase()}</h2>
+      <h3 style="text-align:center">BIÊN BẢN KIỂM PHIẾU BẦU CỬ ĐIỆN TỬ</h3>
+      <p>Thời gian lập biên bản: ${new Date().toLocaleString("vi-VN")}</p>
+      ${rows}
+    </body></html>`;
+    const blob = new Blob([html], { type: "application/msword" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `Bien_Ban_Kiem_Phieu_${currentConfKey}.doc`;
+    a.click();
+    showToast("📄 Đã tải xuống Biên bản Kiểm phiếu (.DOC)");
+  }
+
+  function exportCsvResults() {
+    const conf = CONFERENCES[currentConfKey];
+    const lines = ["STT,Ma_UCV,Ho_Ten,Don_Vi,So_Phieu"];
+    conf.candidates.forEach((c, idx) => lines.push(`${idx + 1},${c.id},"${c.name}","${c.unit}",${c.votes}`));
+    const blob = new Blob(["﻿" + lines.join("
+")], { type: "text/csv;charset=utf-8;" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `Ket_Qua_Kiem_Phieu_${currentConfKey}.csv`;
+    a.click();
+    showToast("📊 Đã tải xuống bảng kết quả (.CSV)");
+  }
+
+  function renderRosterTable() {
+    const q = (document.getElementById("rosterSearch")?.value || "").toLowerCase();
+    const filtered = DELEGATES.filter(d => d.name.toLowerCase().includes(q) || d.code.toLowerCase().includes(q));
+    document.getElementById("rosterListContainer").innerHTML = filtered.map(d => `
+      <div class="p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between text-xs bg-slate-50/40">
+        <div>
+          <span class="font-extrabold text-slate-900">${d.code} • ${d.name}</span>
+          <span class="text-slate-500 ml-2">(${d.group}) • Giờ quét: ${d.time}</span>
+        </div>
+        <button onclick="toggleDelegatePresent('${d.code}')" class="px-3 py-1.5 rounded-xl font-bold ${d.present ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-700'}">
+          ${d.present ? '✓ Có mặt' : 'Vắng mặt'}
+        </button>
+      </div>
+    `).join("");
+    renderQrCards();
+  }
+
+  function toggleDelegatePresent(code) {
+    const d = DELEGATES.find(x => x.code === code);
+    if (!d) return;
+    d.present = !d.present;
+    d.time = d.present ? new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) : "--:--";
+    renderRosterTable();
+  }
+
+  function importBulkDelegates() {
+    const raw = document.getElementById("bulkDelegateInput").value.trim();
+    if (!raw) return showToast("⚠️ Hãy dán dữ liệu đại biểu vào ô!");
+    const lines = raw.split(/?
+/);
+    let count = 0;
+    lines.forEach(line => {
+      const parts = line.split(/[|	,;]/).map(s => s.trim()).filter(Boolean);
+      if (parts.length >= 2) {
+        DELEGATES.push({
+          code: parts[0].toUpperCase(),
+          name: parts[1],
+          group: parts[2] || "Đại biểu chính thức",
+          present: false,
+          time: "--:--"
+        });
+        count++;
+      }
+    });
+    document.getElementById("bulkDelegateInput").value = "";
+    renderRosterTable();
+    showToast(`✅ Đã nạp thêm ${count} đại biểu!`);
+  }
+
+  function renderQrCards() {
+    const baseUrl = window.location.origin + window.location.pathname;
+    document.getElementById("qrCardsContainer").innerHTML = DELEGATES.map(d => {
+      const autoUrl = `${baseUrl}?qr=${encodeURIComponent(d.code)}`;
+      return `
+        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-mono font-extrabold px-2 py-0.5 rounded bg-sky-100 text-sky-800">${d.code}</span>
+            <span class="text-[10px] font-bold text-slate-500">THPT HỒ THỊ BI</span>
+          </div>
+          <div class="text-sm font-extrabold text-slate-900">${d.name}</div>
+          <div class="text-xs text-slate-500">${d.group}</div>
+          <div class="text-[10px] font-mono text-sky-700 break-all bg-white p-2 rounded-lg border border-slate-200">${autoUrl}</div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderDuplicates() {
+    document.getElementById("dupCountBadge").textContent = DUPLICATES.length;
+    document.getElementById("duplicateListContainer").innerHTML = DUPLICATES.map(item => `
+      <div class="p-4 rounded-2xl border border-rose-200 bg-rose-50/50 flex items-center justify-between gap-2 text-xs">
+        <div>
+          <div class="font-extrabold text-rose-900">${item.code} • ${item.name}</div>
+          <div class="text-slate-600">${item.devices}</div>
+        </div>
+        <button onclick="resolveDup('${item.id}')" class="px-3 py-1.5 rounded-xl bg-rose-600 text-white font-bold shrink-0">Khóa máy phụ</button>
+      </div>
+    `).join("");
+  }
+
+  function resolveDup(id) {
+    DUPLICATES = DUPLICATES.filter(x => x.id !== id);
+    renderDuplicates();
+    showToast("🛡️ Đã khóa thiết bị đăng nhập trùng!");
+  }
+
+  function toggleStageLed(show) {
+    const modal = document.getElementById("stageLedModal");
+    if (show) {
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      closeMobileSidebar();
+    } else {
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+  }
+
+  function startSpeechTimer(seconds) {
+    clearInterval(speechTimerInterval);
+    let rem = seconds;
+    const render = () => {
+      const m = String(Math.floor(rem / 60)).padStart(2, "0");
+      const s = String(rem % 60).padStart(2, "0");
+      document.getElementById("stageTimerDisplay").textContent = `${m}:${s}`;
+    };
+    render();
+    speechTimerInterval = setInterval(() => {
+      if (rem > 0) { rem--; render(); }
+      else clearInterval(speechTimerInterval);
+    }, 1000);
+  }
+  function stopSpeechTimer() {
+    clearInterval(speechTimerInterval);
+  }
+
+  function saveCloudConfig() {
+    const wUrl = document.getElementById("cfgWorkerUrl").value.trim();
+    const gUrl = document.getElementById("cfgGasUrl").value.trim();
+    const fId = document.getElementById("cfgDriveFolderId").value.trim();
+    localStorage.setItem(STORAGE_PREFIX + "WORKER_URL", wUrl);
+    localStorage.setItem(STORAGE_PREFIX + "GAS_URL", gUrl);
+    localStorage.setItem(STORAGE_PREFIX + "DRIVE_FOLDER_ID", fId);
+    showToast("💾 Đã lưu cấu hình Cloud độc lập V5.0!");
+  }
+
+  function exportFullBackupJson() {
+    const payload = {
+      version: "5.0.0-INDEPENDENT",
+      exportedAt: new Date().toISOString(),
+      conferences: CONFERENCES,
+      delegates: DELEGATES
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "HTB_DA_HOI_NGHI_V5_BACKUP.json";
+    a.click();
+  }
+
+  function renderAll() {
+    renderAgenda();
+    renderDocuments();
+    renderCandidates();
+    renderMotions();
+    renderTellerResults();
+    renderRosterTable();
+    renderDuplicates();
+  }
+
+  // Tự động nhận diện nếu đại biểu quét thẻ QR có sẵn tham số ?qr=HTB-001 trên URL
+  window.addEventListener("DOMContentLoaded", () => {
+    renderAll();
+    const params = new URLSearchParams(window.location.search);
+    const qrCodeParam = params.get("qr");
+    if (qrCodeParam) {
+      quickQRLogin(qrCodeParam);
+    }
+  });
+</script>
+</body>
+</html>
